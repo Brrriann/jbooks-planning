@@ -1,0 +1,142 @@
+{
+  "package": "제이북스 발주자동화 전체자료 정리본",
+  "version": "1.1",
+  "date": "2026-09-20",
+  "authoritative": [
+    "제이북스_발주자동화_기획통합본_v1.1",
+    "제이북스_발주자동화_PRD_로직보드_v0.5",
+    "제이북스_화면설계_구현계획_v0.2"
+  ],
+  "verification": {
+    "plan_pdf_pages": 14,
+    "field_guide_pdf_pages": 12,
+    "observed_ui_types": 7,
+    "observed_account_labels": 27,
+    "observed_account_activation_verified": false,
+    "queried_batch_rows": 5,
+    "planned_acceptance_tests": 48,
+    "prototype_scenarios_passed": 23,
+    "prototype_external_requests": 0,
+    "database_connected": false,
+    "production_mutations_tested": false
+  },
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 105,
+      "sha256": "a098ba5a9de417ebbc80f068dfa50812c24922bb09a110e66adac794fc471fc0"
+    },
+    {
+      "path": ".nojekyll",
+      "bytes": 2,
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "path": "404.html",
+      "bytes": 639,
+      "sha256": "dea9e42006f2f78896af69538e332fac53e9d72e7bbc9b3d50213098f7f32cf2"
+    },
+    {
+      "path": "index.html",
+      "bytes": 10744,
+      "sha256": "c1d82c2d9244c2680a2b197ff73d930121706ea828b8cf951ad3d1d2f82a2f97"
+    },
+    {
+      "path": "jbooks-review-v1.1.zip",
+      "bytes": 974244,
+      "sha256": "e1001efd9af725265143c0a6becb82f0a71112d06ad1546aea8139441383e409"
+    },
+    {
+      "path": "README.md",
+      "bytes": 751,
+      "sha256": "307170a379ab5f8e07e8e7532e6010bf59fa76b0be7ea8dfe8e62201533f9d55"
+    },
+    {
+      "path": "읽어주세요.txt",
+      "bytes": 2776,
+      "sha256": "eebce51c938386a68e47f83746e160b1546f4784e8226bde29f6dd39e88e1025"
+    },
+    {
+      "path": "자료_변경대응표_v1.1.html",
+      "bytes": 8455,
+      "sha256": "6efd034fd3e6653bfa35e590e475cb96e23be56182755dc94a6f36087f9da4d8"
+    },
+    {
+      "path": "자료_변경대응표_v1.1.md",
+      "bytes": 1662,
+      "sha256": "cd2eeeb972f8c43245465f831cd08741775371bb87cfcb5efefbd86a3f2e38f5"
+    },
+    {
+      "path": "제이북스_발주자동화_PRD_로직보드_v0.5.html",
+      "bytes": 101277,
+      "sha256": "4f4164d33385e9493c4fb676487d576bbdaadbf9482d70f95d08efc9f39c3724"
+    },
+    {
+      "path": "제이북스_발주자동화_PRD_로직보드_v0.5.md",
+      "bytes": 70403,
+      "sha256": "9520af10ecaf4372069a1b455769fbf67170c21f11396a2a8e6b32e6da88b71b"
+    },
+    {
+      "path": "제이북스_발주자동화_기획통합본_v1.1.html",
+      "bytes": 49485,
+      "sha256": "c3e59435f928dd7a95b0cf9ef867971d8a4f368ebaf4db8f55952a22b4ca9725"
+    },
+    {
+      "path": "제이북스_발주자동화_기획통합본_v1.1.md",
+      "bytes": 34016,
+      "sha256": "6f0f4a51d0b4a0006ce1e5145a8d3eb5c5bc1bc0409b9c08048714bb631a93f5"
+    },
+    {
+      "path": "제이북스_발주자동화_기획통합본_v1.1.pdf",
+      "bytes": 230790,
+      "sha256": "0ff5aaa104928499056e703c578f7cc0e47d4dcf64ed8b358c417e2d34b37fb8"
+    },
+    {
+      "path": "제이북스_실프로그램_계획검증_20260920.md",
+      "bytes": 17798,
+      "sha256": "c58c90e6fa5a40c61bb717af0117e9467b94daa72188965accef53d8487ffe9f"
+    },
+    {
+      "path": "제이북스_실프로그램_계획검증_20260920.pdf",
+      "bytes": 196545,
+      "sha256": "7e24211ce055718c6192c9416bee96903a56f150941dbb2d5ef01a5e41e53752"
+    },
+    {
+      "path": "제이북스_현장조사_인터뷰_기록지_v1.1.html",
+      "bytes": 88252,
+      "sha256": "5ab20b1d69647e576421fc329a4f90e981a39d3cb31e6bc0143e771da5d2aa82"
+    },
+    {
+      "path": "제이북스_현장조사_인터뷰_기록지_v1.1.pdf",
+      "bytes": 737429,
+      "sha256": "c7ff7226f097b27b903588a88aea6f5f8411c209ec35d0502ee17484e0442f4e"
+    },
+    {
+      "path": "제이북스_화면설계_구현계획_v0.2.html",
+      "bytes": 34275,
+      "sha256": "3ccbc544b324f4968bc8b75902d387d0ba7bc23ae0b13573c59411de09f69d77"
+    },
+    {
+      "path": "제이북스_화면설계_구현계획_v0.2.md",
+      "bytes": 19344,
+      "sha256": "8b0dab52d6bb7ece7caf3d22d684d158f9a44d633a2c34bba0dd6a38d8416037"
+    },
+    {
+      "path": "화면_프로토타입/index.html",
+      "bytes": 330435,
+      "sha256": "823ce12873dbf7590eb400ff48337ba34ddf109f72ba4ad985f76a135a9edb47"
+    },
+    {
+      "path": "화면_프로토타입/THIRD_PARTY_NOTICES.txt",
+      "bytes": 5927,
+      "sha256": "2faac4b0c2aa929d82a97dee054ebc03fa2dbea891c38dd4a03fd7751275f7ab"
+    },
+    {
+      "path": "화면_프로토타입/읽어주세요.txt",
+      "bytes": 2113,
+      "sha256": "c1a2482d462aefc2cf4a3d81ee33c5ef448c3099d9b1630bedced0fabf843e1d"
+    }
+  ],
+  "delivery": "GitHub Pages",
+  "proposed_url": "https://Brrriann.github.io/jbooks-planning/"
+}

@@ -1,0 +1,1288 @@
+<!doctype html>
+<html lang="ko"><head><meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="제이북스 주문·취소 수집부터 1차 발주 저장까지의 업무 로직, 크롤링 대상 선정, 미송 처리, 기능 요구사항과 수용 테스트"><title>제이북스 · 발주자동화 PRD & 로직보드 v0.5</title><style>
+:root{--ink:#172e2b;--muted:#62746d;--paper:#fffefa;--bg:#efefe7;--line:#d9e0d4;--accent:#d4e89b;--green:#245b43;--soft:#f2f5eb;--amber:#9b5e1e}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.95 "Malgun Gothic",sans-serif}a{color:var(--green);text-underline-offset:4px}button{font:inherit}a:focus-visible,button:focus-visible,.tablewrap:focus-visible{outline:3px solid #ac7d26;outline-offset:4px}.masthead{background:var(--ink);color:var(--paper);padding:36px max(28px,calc((100vw - 1320px)/2)) 38px;position:relative}.kicker{font:11px/1.6 Consolas,monospace;letter-spacing:.19em;color:#b6c8b4;display:flex;justify-content:space-between;gap:24px}.hero{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:60px;align-items:end;padding-top:30px}h1{font-size:clamp(36px,4.3vw,62px);line-height:1.25;letter-spacing:-.05em;font-weight:600;margin:10px 0 22px}.hero p{color:#c7d4c7;max-width:720px;line-height:1.85;margin:0}.hero em{font-style:normal;color:var(--accent)}.document-stamp{border-top:1px solid #60766a;padding-top:17px;font:12px/2 Consolas,"Malgun Gothic",monospace;color:#ced9c6}.document-stamp strong{color:var(--accent);display:block;font-size:26px;line-height:1.4;margin-bottom:12px}.hero-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.hero-meta span{border:1px solid #516657;color:#d9e2cc;padding:4px 9px;font-size:11px}.toolbar{position:sticky;top:0;z-index:2;background:#fffefaf7;border-bottom:1px solid var(--line);padding:12px max(24px,calc((100vw - 1320px)/2));display:flex;align-items:center;gap:22px;flex-wrap:wrap}.toolbar a,.toolbar button{font-size:12px;text-decoration:none;white-space:nowrap}.toolbar button{margin-left:auto;padding:5px 13px;background:var(--ink);color:white;border:0;cursor:pointer}.overview{max-width:1376px;padding:32px 28px 0;margin:auto;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:0}.overview>div{padding:20px 24px;border:1px solid var(--line);background:var(--paper);border-right:0}.overview>div:last-child{border-right:1px solid var(--line)}.overview small{font:10px Consolas,monospace;letter-spacing:.14em;color:var(--muted);display:block;margin-bottom:10px}.overview b{font-size:19px;font-weight:600;line-height:1.5;display:block}.overview p{font-size:12px;color:var(--muted);margin:7px 0 0}.layout{max-width:1376px;margin:32px auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px;padding:0 28px}.toc{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 110px);overflow:auto;font-size:11px;line-height:1.55}.toc>b{display:block;letter-spacing:.17em;font:10px Consolas,monospace;margin:10px 0 14px}.toc a{display:block;text-decoration:none;padding:9px 0;border-bottom:1px solid var(--line);color:#546a5d}.toc a.active{color:#173d2b;font-weight:bold;border-left:3px solid var(--green);padding-left:9px}.draft-note{padding:14px 0;color:#777667;font-size:11px;line-height:1.8}.content{min-width:0;background:var(--paper);padding:18px 38px 50px;border:1px solid var(--line)}h2{font-size:26px;line-height:1.5;letter-spacing:-.035em;border-top:1px solid #bfcfbe;padding-top:28px;margin:50px 0 20px}h2:first-of-type{margin-top:30px}h3{font-size:18px;line-height:1.6;margin:30px 0 15px}p{margin:13px 0;word-break:keep-all;overflow-wrap:anywhere}li{margin:7px 0;padding-left:4px;word-break:keep-all;overflow-wrap:anywhere}strong{color:#164d35}blockquote{border-left:3px solid var(--green);padding:13px 22px;background:var(--soft);margin:23px 0;font-size:16px;font-weight:500}blockquote p{margin:3px 0}.tablewrap{overflow-x:auto;margin:23px 0;border:1px solid var(--line)}table{border-collapse:collapse;width:100%;min-width:660px;font-size:12px;line-height:1.85}th{text-align:left;background:#224937;color:white;font-weight:500}th,td{padding:13px 14px;vertical-align:top;border-bottom:1px solid var(--line)}td{word-break:keep-all;overflow-wrap:anywhere}tbody tr:nth-child(even){background:#f3f5ee}tbody tr:last-child td{border-bottom:0}.req-id{font-family:Consolas,monospace;font-size:.95em;white-space:nowrap}pre{background:#edf2e6;padding:20px;border-left:3px solid #b8cb91;overflow:auto;font:12px/1.9 Consolas,"Malgun Gothic",monospace}code{font-family:Consolas,"Malgun Gothic",monospace}.logicboard{background:#e9eee2;border:1px solid #c9d4c0;padding:24px;margin:24px -12px}.board-heading{display:flex;justify-content:space-between;gap:20px;margin-bottom:22px;align-items:start}.eyebrow{font:10px/1.7 Consolas,monospace;letter-spacing:.12em}.legend{font-size:10px;color:#667960}.step-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.step{padding:20px 20px 14px;background:var(--paper);border:1px solid #c6d3be;position:relative;min-height:164px}.step-number{position:absolute;right:16px;top:17px;font:30px/1 Consolas,monospace;color:#b4c4a7}.step-top{padding-right:35px}.step small{font:9px Consolas,monospace;color:#6d7f65;letter-spacing:.08em}.step h4{font-size:18px;line-height:1.5;letter-spacing:-.035em;margin:6px 0}.step p{font-size:11px;margin:6px 0 12px;color:#4e6552}.step-note{font-size:10px;border-top:1px solid #dde4d4;padding-top:8px;color:#65755d;line-height:1.8}.terminal{background:#204b36;border-color:#204b36;color:white}.terminal p,.terminal small,.terminal .step-note{color:#d4e2c3}.terminal .step-number{color:#92b88a}.terminal .step-note{border-color:#4a6b4f}.decision-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;border-top:1px solid #bacbb2;margin-top:22px;padding-top:17px}.decision-strip b{font-size:12px;display:block}.decision-strip span{font-size:10px;color:#64755d;display:block;margin-top:5px}.board-foot{font-size:9px;color:#6e7f65;border-top:1px solid #cdd8c4;margin-top:15px;padding-top:12px}.architecture{background:#edf2e7;border:1px solid #cbd8c0;padding:25px;margin:24px 0;text-align:center}.arch-input{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.arch-input>div,.arch-row,.arch-mid>div{border:1px solid #c8d4bd;background:#fffefa;padding:15px 10px}.arch-input small{font:9px Consolas,monospace;color:#6b7c61;letter-spacing:.1em;display:block;margin-bottom:8px}.architecture b{display:block;font-size:13px}.architecture span{font-size:10px;color:#677b5c;display:block;margin-top:5px}.arch-arrow{font:22px/1.6 Consolas,monospace;color:#8aa175}.arch-mid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.arch-mid>div{background:#e0eacf}.arch-output{background:#204b36;padding:20px 12px;color:white}.arch-output span{color:#d0dfb9}footer{max-width:1320px;margin:30px auto 45px;border-top:1px solid #c7d3bf;padding:22px 0;font-size:11px;color:#687760;display:flex;justify-content:space-between;gap:25px}
+@media(max-width:1080px){.layout{grid-template-columns:180px minmax(0,1fr);gap:22px}.content{padding:18px 27px 40px}.overview b{font-size:17px}.toolbar{gap:14px}.hero{gap:30px}}
+@media(max-width:880px){.layout{display:block;margin:24px auto}.toc{position:static;max-height:none;margin-bottom:24px}.toc nav{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.draft-note{display:none}.content{padding:20px 26px}.hero{grid-template-columns:1fr}.document-stamp{display:none}.overview{grid-template-columns:1fr}.overview>div{border-right:1px solid var(--line);border-bottom:0}.overview>div:last-child{border-bottom:1px solid var(--line)}.toolbar{position:static}.overview b{font-size:18px}footer{margin:24px 28px}.logicboard{margin-left:0;margin-right:0}h1{font-size:44px}}
+@media(max-width:560px){.masthead{padding:24px 20px 30px}.kicker{font-size:9px;letter-spacing:.09em}.kicker span:last-child{display:none}.hero{padding-top:14px}h1{font-size:36px}.hero p{font-size:13px}.hero-meta{gap:6px}.toolbar{padding:12px 20px;gap:12px}.toolbar button{margin-left:0}.overview{padding:20px 12px 0}.overview>div{padding:18px}.layout{padding:0 12px}.content{padding:16px}.toc{padding:0 7px}.toc a{font-size:10px}body{font-size:14px}h2{font-size:23px;margin-top:40px}h3{font-size:17px}blockquote{font-size:14px;padding:12px 15px}.logicboard{padding:14px}.board-heading{display:block}.legend{display:block;margin-top:10px}.step-grid{grid-template-columns:1fr}.step{min-height:145px}.decision-strip{grid-template-columns:1fr;gap:12px}.decision-strip>div{display:grid;grid-template-columns:115px 1fr;gap:8px}.decision-strip span{margin-top:0}.arch-input,.arch-mid{grid-template-columns:1fr}.architecture{padding:16px}.arch-input>div{padding:10px}.arch-input small{margin-bottom:4px}footer{display:block;margin:24px 20px}.tablewrap{margin:18px 0}pre{font-size:11px;padding:15px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{@page{size:A4;margin:14mm}html{scroll-behavior:auto}body{background:white;font-size:9pt;line-height:1.65}.toolbar,.toc,.overview{display:none}.masthead{padding:10mm 0;background:white;color:#172e2b;border-bottom:3px solid #245b43}.hero{display:block;padding:0}h1{font-size:28pt;margin:8mm 0}.hero p,.hero em,.kicker{color:#172e2b}.hero-meta span{color:#172e2b}.document-stamp{display:none}.layout{display:block;margin:0;padding:0}.content{border:0;padding:0}h2{font-size:17pt;padding-top:6mm;margin-top:10mm;break-after:avoid}h3{font-size:12pt;break-after:avoid}p,li{orphans:3;widows:3}.tablewrap{overflow:visible;border:0}table{min-width:0;font-size:8pt;line-height:1.6}td,th{padding:7px}tr{break-inside:avoid}th{background:#e4ecde;color:#172e2b}.logicboard,.architecture{break-inside:avoid;margin:6mm 0;padding:15px}.step{min-height:120px;padding:12px}.step h4{font-size:13px}.step-number{font-size:23px}.terminal,.arch-output{background:#e3eddb;color:#172e2b}.terminal p,.terminal small,.terminal .step-note,.arch-output span{color:#455b3a}.step-grid{grid-template-columns:1fr 1fr}.arch-input{grid-template-columns:repeat(3,1fr)}.arch-mid{grid-template-columns:1fr 1fr}footer{margin:10mm 0;font-size:8pt}a{color:inherit}pre{white-space:pre-wrap}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body><header class="masthead"><div class="kicker"><span>JBOOKS / PROCUREMENT AUTOMATION</span><span>PRODUCT REQUIREMENTS DOCUMENT</span></div><div class="hero"><div><h1>아침 발주를<br><em>판단 가능한 규칙</em>으로.</h1><p>주문·취소 수집부터 거래처와 부수를 저장하기까지.<br>미송, 세트, 크롤링의 분기를 연결한 업무 로직보드와 제품 요구사항.</p><div class="hero-meta"><span>v0.5 · 검토 초안</span><span>2026.09.20</span><span>실프로그램 + 현장 영상 + 고객 요청</span></div></div><div class="document-stamp"><strong>PRD<br>+ LOGIC BOARD</strong>STATUS / DRAFT<br>SCOPE / 1차 발주 저장<br>METHOD / 자체 코드 구현</div></div></header><nav class="toolbar" aria-label="문서 바로가기"><a href="index.html">기획 자료실</a><a href="제이북스_발주자동화_기획통합본_v1.1.html">기획 통합본</a><a href="#s03">업무 로직보드</a><a href="#collection-modes">예약·수동 수집</a><a href="#stock-formula">적정재고 산식</a><a href="#s05">미송 판단</a><a href="#s06">크롤링 규칙</a><a href="#s07">요구사항</a><a href="#s11">수용 테스트</a><a href="%EC%A0%9C%EC%9D%B4%EB%B6%81%EC%8A%A4_%EB%B0%9C%EC%A3%BC%EC%9E%90%EB%8F%99%ED%99%94_PRD_%EB%A1%9C%EC%A7%81%EB%B3%B4%EB%93%9C_v0.5.md" download>원문 MD ↓</a><a href="https://app.notion.com/p/3e06f936b059810c8804f14cb84d182d?pvs=204" target="_blank" rel="noreferrer">노션 ↗</a><button type="button" id="print">인쇄 / PDF 저장</button></nav><div class="overview"><div><small>DEFINITION OF DONE</small><b>거래처·부수 저장 + 결과 대조</b><p>크롤링 후보 지정은 중간 상태입니다.</p></div><div><small>DECISION PRINCIPLE</small><b>관찰 · 후보 · 제안을 구분</b><p>‘65’와 미송 잔량을 바로 고정 규칙으로 만들지 않습니다.</p></div><div><small>TRACEABLE SPECIFICATION</small><b>12개 요구사항 · 48개 테스트</b><p>수집, 판단, 저장의 결과를 원천까지 연결합니다.</p></div></div><div class="layout"><aside class="toc"><b>DOCUMENT INDEX / 15</b><nav aria-label="전체 목차"><a href="#s01">01. 제품 목표와 완료의 정의</a><a href="#s02">02. 근거와 확정 수준</a><a href="#s03">03. 업무 로직보드</a><a href="#s04">04. 수요·세트·발주 부수 규칙</a><a href="#s05">05. 미송 로직보드</a><a href="#s06">06. 크롤링 대상 선정과 거래처 결정</a><a href="#s07">07. 기능 요구사항</a><a href="#s08">08. 사용자 화면과 확인 흐름</a><a href="#s09">09. 데이터 계약과 자체 구현 구조</a><a href="#s10">10. 저장·실패·재실행 계약</a><a href="#s11">11. 수용 테스트</a><a href="#s12">12. 개발 순서와 통과 기준</a><a href="#s13">13. 성과 지표와 운영 기준</a><a href="#s14">14. DB 검토로 확정할 결정 목록</a><a href="#s15">15. 출처와 문서 상태</a></nav><div class="draft-note">검토용 기획 문서입니다.<br>운영 연결·수집·발주를 실행하지 않았습니다.</div></aside><main class="content">
+<p><strong>v0.5 · 실프로그램 검증 반영 · 2026.09.20</strong><br>기준 자료: 고객 요청, 노션 현장 메모, 2026.09.17 현장 영상 3편, 현장영상 반영 재기획 v4, 2026.09.20 실프로그램 검증 E01부터 E08.</p>
+<blockquote>
+<p>주문·취소를 수집하고 세트·재고·미송을 함께 계산한 뒤, 필요한 상품의 거래처와 발주 부수를 확정하여 제이북스에 저장한다. 사람이 확인해야 할 건에는 이유와 판단 근거를 남긴다.</p>
+</blockquote>
+<h2 id="s01">01. 제품 목표와 완료의 정의</h2>
+<p>오전 담당자의 반복 작업을 줄여 <strong>하루 약 2시간을 확보하는 것</strong>이 고객의 목표다. 절감량은 아직 측정하지 않았다. 영상은 오후 작업 중심이므로 오전의 주문량·거래처 구성·대기시간을 별도로 측정한다.</p>
+<p><strong>1차 발주 완료</strong>는 다음을 모두 만족한 상태다.</p>
+<ol>
+<li>기준시각까지 필요한 판매처·계정의 주문과 취소를 빠짐없이 확인했다.</li>
+<li>주문 상태, 세트 구성, 재고, 기존 발주·입고를 대조하여 신규 발주 필요량을 산출했다.</li>
+<li>크롤링 대상은 공급처 조회와 비교를 마쳤으며, 실제 거래처와 부수가 정해졌다.</li>
+<li>제이북스의 1차 발주 상태로 저장하고, 저장한 거래처·수량·상태를 다시 조회하여 대조했다.</li>
+</ol>
+<p><strong>‘크롤링’으로 임시 지정한 상태는 완료가 아니다.</strong> 확인이 필요한 행이 남으면 실행 결과는 ‘부분 완료’이며, 수집 누락이 있으면 ‘수집 미완료’로 표시한다. 저장 대상이 없는 정상 실행은 모든 수요가 재고·유효 공급으로 충족됐다는 근거가 있어야 ‘발주 없음’으로 종료한다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>범위</th>
+<th>이번 제품에 포함</th>
+<th>경계</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P0 · 반드시 구현</td>
+<td>예약·수동 주문/취소 수집 및 상태 반영, 실패/기간 재수집, 세트 조정, 재고·미송 계산</td>
+<td>공통 수집 모듈·중복 실행 방지; 수집만/1차 발주까지의 실행 범위 구분</td>
+</tr>
+<tr>
+<td>P0 · 반드시 구현</td>
+<td>크롤링 대상 선정, 북센·교보·예스24·알라딘 비교, 거래처·부수 확정</td>
+<td>4개 조회 경로를 새 코드로 구현·검증; 수동 파일이 개입하면 자동 처리로 집계하지 않음</td>
+</tr>
+<tr>
+<td>P0 · 반드시 구현</td>
+<td>이전 이력·최근 3주 주문 기반 적정재고 산식, 1차 발주 저장, 예외 확인, 재시작·대조</td>
+<td>산식과 가중치는 과거 재현·시험으로 검증; 불완전한 입력은 확인 목록으로 이동</td>
+</tr>
+<tr>
+<td>P1 · 후속 고도화</td>
+<td>계절·행사 예측, 적정재고 모델 고도화, 가격 추세, 묶음 구매 최적화</td>
+<td>P0 산식 대비 추가 효과를 과거 이력과 운영 결과로 평가</td>
+</tr>
+<tr>
+<td>이번 범위 밖</td>
+<td>공급처 주문 전송·결제, 장바구니 변경, 반품 후 재매입, 손실을 이유로 한 고객 주문 자동 취소</td>
+<td>별도 제품 범위로 결정해야 함</td>
+</tr>
+</tbody></table></div>
+<p>기존 프로그램의 코드·스크립트·업무 로직을 호출하여 재사용하지 않고 <strong>자체 코드로 구현</strong>한다. 기존 DB의 트리거·제약·채번·후속 처리 관계는 조사하고, 운영 데이터가 갖춰야 할 조건을 충족하는 저장 계약을 만든다.</p>
+<h2 id="s02">02. 근거와 확정 수준</h2>
+<p>이 문서의 ‘관찰’은 실제 화면·발언에서 확인한 사실, ‘규칙 후보’는 일반화 검증이 필요한 판단, ‘설계 제안’은 신규 도구의 동작 제안이다. 초안의 제안을 운영 승인된 규칙으로 취급하지 않는다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>수준</th>
+<th>현재 알 수 있는 내용</th>
+<th>남은 검증</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>완료 범위·자체 개발</td>
+<td>고객 요청</td>
+<td>수집·처리 후 거래처·부수 저장까지</td>
+<td>DB의 저장과 전송 상태 경계</td>
+</tr>
+<tr>
+<td>세트 조정·구성품 중복</td>
+<td>현장 관찰</td>
+<td>겹치는 낱권 수요를 함께 계산해야 함</td>
+<td>구성표·수불·실제 저장 단위</td>
+</tr>
+<tr>
+<td>크롤링 지정</td>
+<td>규칙 후보</td>
+<td>‘보통 65가 아니면’ 조회한다는 발언과 특정 거래처 예외</td>
+<td>공급률 필드·단위·예외 우선순위·적용 범위</td>
+</tr>
+<tr>
+<td>미송 정책</td>
+<td>고객 사례·현장 관찰</td>
+<td>잔량을 유지하는 거래처와 재발주가 필요한 거래처가 공존</td>
+<td>원발주별 종료·배송·예정일·연락 결과</td>
+</tr>
+<tr>
+<td>적정재고·판매량</td>
+<td>고객 추가 요청·산식 초안</td>
+<td>이전 이력과 최근 3주 주문으로 목표재고·발주량 계산</td>
+<td>취소·세트 단위, 가중치·이전 기간, 거래처별 보충기간·안전재고 검증</td>
+</tr>
+<tr>
+<td>자동 처리의 보류·대조</td>
+<td>설계 제안</td>
+<td>모호한 상태는 이유를 표시하고 재계산</td>
+<td>고객 검토와 시험 시나리오 통과</td>
+</tr>
+</tbody></table></div>
+<p>V55 34:02–36:03의 ‘65’는 <strong>공급률</strong>에 관한 발언이다. 할인율이나 모든 상품에 적용할 고정 임계값으로 확정하지 않는다. 값이 65여도 견적이 오래됐거나 재고·거래 조건이 불명확하면 확인이 필요하다.</p>
+<p><strong>추가 관찰 E01부터 E08:</strong> 실행 중인 v1.0.0.94의 7개 업무 화면을 열람하고, 매입처명 한정 조회와 한 발주 회차 조회만 수행했다. 화면 구조와 5개 결과 행의 존재를 확인했으며 운영 수집·취소처리·발주 저장·재고 조정·DB 연결은 하지 않았다. 10개 그룹·27개 표시 계정은 활성 계정 수가 아니다. 서버 정보는 고객 제공 자료이며 이번 열람으로 재확인하지 않았다.</p>
+<h2 id="s03">03. 업무 로직보드</h2>
+<div class="logicboard" aria-label="업무 로직보드"><div class="board-heading"><span class="eyebrow">MORNING RUN / DECISION FLOW</span><span class="legend">● 확정 가능한 항목 → 저장 &nbsp; ◇ 불명확한 항목 → 확인</span></div><div class="step-grid"><div class="step "><span class="step-number">01</span><div class="step-top"><small><span class="req-id">FR-01</span></small><h4>예약·수동 실행 요청</h4></div><p>예약 설정 · 지금 수집 · 재수집</p><div class="step-note">공통 대기열에서 실행 범위와 계정을 확정합니다.</div></div><div class="step "><span class="step-number">02</span><div class="step-top"><small><span class="req-id">FR-02</span></small><h4>주문·취소 수집</h4></div><p>중복 · 부분취소 · 계정별 진행점</p><div class="step-note">수집만 실행은 여기서 종료하고 발주 상태와 구분합니다.</div></div><div class="step "><span class="step-number">03</span><div class="step-top"><small><span class="req-id">FR-03</span></small><h4>세트·재고 배분</h4></div><p>구성품 합산 · 수불 · 원수요</p><div class="step-note">같은 낱권과 재고를 한 번만 배분합니다.</div></div><div class="step "><span class="step-number">04</span><div class="step-top"><small><span class="req-id">FR-04</span> / 05</small><h4>목표재고·미송 계산</h4></div><p>3주 주문 · 이전 이력 · 보충기간</p><div class="step-note">목표재고와 실제 발주 부수를 구분합니다.</div></div><div class="step "><span class="step-number">05</span><div class="step-top"><small><span class="req-id">FR-06</span></small><h4>크롤링 대상 선정</h4></div><p>65 후보 · 예외 · 최신성</p><div class="step-note">조회·생략·보류의 이유를 기록합니다.</div></div><div class="step "><span class="step-number">06</span><div class="step-top"><small><span class="req-id">FR-07</span></small><h4>4개 공급처 비교</h4></div><p>북센 · 교보 · 예스24 · 알라딘</p><div class="step-note">누락·실패와 품절을 구분합니다.</div></div><div class="step "><span class="step-number">07</span><div class="step-top"><small><span class="req-id">FR-08</span></small><h4>거래처·부수 확정</h4></div><p>도착일 · 공급률 · 최소 부수</p><div class="step-note">필수 거래 조건부터 확인합니다.</div></div><div class="step terminal"><span class="step-number">08</span><div class="step-top"><small><span class="req-id">FR-09</span> / 11</small><h4>저장하고 다시 대조</h4></div><p>동시 수정 · 중복 방지 · 복구</p><div class="step-note">제이북스에 거래처와 부수가 일치해야 완료입니다.</div></div></div><div class="decision-strip"><div><b>유효 조건에서 필요량 0 확정</b><span>잠정 0만으로 종료하지 않고 정책·보호기간 대조</span></div><div><b>조건 불명·충돌</b><span>사실 확인 → 영향 단계부터 재계산</span></div><div><b>수집 불완전</b><span>영향 분리가 불가능하면 자동 저장 보류</span></div></div><div class="board-foot">읽는 순서: 01 → 08. 전체 조건과 예외 분기는 아래 단계표 및 미송·크롤링 판단표에 정의합니다.</div></div>
+<h3>단계별 입력과 산출물</h3>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>입력</th>
+<th>처리·분기</th>
+<th>반드시 남기는 결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L01 시작</td>
+<td>예약/수동 요청, 실행 범위, 활성 계정, 회차·기준시각·정책 버전</td>
+<td>공통 대기열·계정별 실행권, 오전/오후 회차 구분</td>
+<td>실행 ID, 요청자/예약 ID, 대상·조회 범위·기준시각</td>
+</tr>
+<tr>
+<td>L02 수집</td>
+<td>원주문·취소 이벤트, 이전 처리 이력</td>
+<td>중복 제거, 부분취소·역순 이벤트·출고 상태 대조</td>
+<td>원천 키, 상태 버전, 계정별 완전성</td>
+</tr>
+<tr>
+<td>L03 세트·재고</td>
+<td>세트 구성, 원수요, 완성 세트·낱권 재고</td>
+<td>공유 구성품 합산, 한 번만 재고 배분</td>
+<td>원주문→세트→낱권 배분표, 조정 수불</td>
+</tr>
+<tr>
+<td>L04 목표·미송</td>
+<td>최근 3주·이전 주문, 원발주·입고·종료, 필요일</td>
+<td>Q03–Q09 목표재고 산식과 잔량 유효성·시점 검증</td>
+<td>목표재고, 수요에 배분한 공급, 불명 잔량, 잠정 필요량</td>
+</tr>
+<tr>
+<td>L05 대상 선정</td>
+<td>필요량, 공급률·시각, 상품·출판사·거래처 정책</td>
+<td>조회 필요·조회 생략·확인 필요 결정</td>
+<td>규칙 ID, 입력값, 선정·제외 이유</td>
+</tr>
+<tr>
+<td>L06 조회</td>
+<td>ISBN·판본·부수·계정, 허용된 조회 경로</td>
+<td>4개 공급처 결과 표준화, 누락·실패 구분</td>
+<td>공급처별 원응답/파일 근거, 조회시각, 조건</td>
+</tr>
+<tr>
+<td>L07 결정</td>
+<td>공급 가능성, 입고일, 공급률, 최소 부수·배송·반품 조건</td>
+<td>후보별 H·SS·S·Q 재계산, 조건 통과 후보 간 우선순위 적용</td>
+<td>선택·탈락 이유, 최종 부수, 적용 정책</td>
+</tr>
+<tr>
+<td>L08 저장</td>
+<td>최종 계획, 입력 버전, 기존 저장 결과</td>
+<td>동시 수정·새 취소·새 입고를 다시 확인</td>
+<td>제이북스 발주 키, 대조 결과, 처리 이력</td>
+</tr>
+</tbody></table></div>
+<p>수집 실패로 누락된 신규 주문의 상품을 알 수 없으므로 ‘성공한 계정의 상품만 안전하다’고 가정하지 않는다. <strong>영향 범위를 데이터로 분리할 수 없다면 해당 실행의 자동 저장을 보류</strong>한다. 분리 가능한 처리 단위는 데이터 계약에서 정의한다.</p>
+<h3 id="collection-modes">COL-01. 예약 수집과 수동 수집 — P0</h3>
+<p>고객 추가 요청에 따라 <strong>주문·취소 수집은 예약 실행과 수동 실행을 모두 지원</strong>한다. 두 방식은 같은 수집 모듈과 상태 반영 절차를 사용한다. 실행 방식이 달라도 원주문·취소의 식별 키와 중복 방지 기준은 같다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>설정·사용 방법</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>예약 수집</td>
+<td>실행 시각·요일 또는 반복 간격, 대상 판매처·계정, 사용/중지, 후속 처리 범위 설정</td>
+<td>다음 실행 예정시각과 최근 실행 결과 표시; 지정 조건에 따라 자동 수집</td>
+</tr>
+<tr>
+<td>수동 수집</td>
+<td>‘지금 수집’에서 전체 또는 선택 계정 실행</td>
+<td>즉시 요청을 등록하고 계정별 대기·수집·반영·완료 상태 표시</td>
+</tr>
+<tr>
+<td>실패 건 재수집</td>
+<td>실패·중단 계정 또는 실패 구간 선택</td>
+<td>확인된 진행점부터 재처리; 성공한 주문·취소를 중복 반영하지 않음</td>
+</tr>
+<tr>
+<td>기간 지정 재수집</td>
+<td>조회 가능 기간 안에서 시작·종료 구간 지정</td>
+<td>과거 구간 재조회·대조; 정상 증분 수집의 진행점을 과거로 되돌리지 않음</td>
+</tr>
+</tbody></table></div>
+<p>기준 시간대는 <strong>Asia/Seoul</strong>이며 화면에 표시한다. 실제 오전·추가 수집 시각과 주기는 운영 설정으로 확정하며 이 문서에서 임의로 예약을 활성화하지 않는다. 설정에는 마지막 실행·다음 실행, 예약 버전, 대상 계정, 실행 범위를 함께 표시한다. 주문과 취소를 한 수집 범위로 취급하고, 주문만 성공한 상태를 수집 완료로 표시하지 않는다.</p>
+<h3>COL-02. ‘수집만’과 ‘1차 발주까지’ 구분</h3>
+<p>수동 실행의 기본 버튼은 <strong>주문·취소 수집/반영</strong>이다. 여기까지는 판매처 상태를 수집하고 검증된 주문·취소 상태를 반영하는 단계이며, 발주 후보 확정·발주 저장을 자동으로 시작하지 않는다. 별도 <strong>수집 후 1차 발주까지</strong> 실행을 제공한다. 예약 설정도 두 범위 중 하나를 명시하고, 실행 이력에 선택한 범위를 남긴다.</p>
+<p>수집 결과의 ‘완료’와 전체 발주 실행의 ‘완료’를 별도 상태로 표시한다. 선택 계정만 수동 수집한 경우 해당 수집은 완료될 수 있지만, 필요한 전체 계정의 완전성·기준시각이 충족되지 않으면 전체 수요 확정이나 1차 발주 저장으로 진행하지 않는다. 연결 실행도 L02 이후의 세트·미송·크롤링·최신 상태 검증을 생략하지 않는다.</p>
+<h3>COL-03. 중복 실행과 누락 방지</h3>
+<p>예약 실행과 수동 실행은 <strong>공통 실행 대기열</strong>로 들어간다. 같은 판매처·계정의 주문/취소 수집은 동시에 두 작업이 처리하지 않도록 실행권을 관리한다. 서로 다른 계정은 판매처의 허용 동시성·호출 제한 안에서 처리한다.</p>
+<p>이미 처리 중인 요청이 새 요청의 조회 구간을 모두 포함하고 같은 처리 범위라면 진행 중 실행을 연결해 보여준다. 새 요청의 종료시각이 더 늦거나 계정·기간·후속 처리 범위가 다르면 차이를 기록하여 후속 작업으로 대기시킨다. <strong>단순히 ‘실행 중’이라는 이유로 새 수집 범위를 버리지 않는다.</strong> 수집만 실행 중인 작업을 예약 요청 때문에 발주 실행으로 바꾸지 않으며, 후속 발주 의도도 별도 실행으로 검증한다.</p>
+<p>예약 발생 자체는 예약 ID+예정시각으로 중복 등록을 막고, 업무 반영은 판매처·계정·주문행·이벤트 버전으로 중복을 막는다. 계정별 마지막 성공 진행점을 보관하되 주문·취소 각각의 완료 범위를 추적한다. 조회 API의 수정시각·이벤트 방식에 맞춰 겹치는 재조회 구간을 두고, 늦은 취소·부분취소도 놓치지 않도록 대조한다. 과거 주문의 늦은 취소를 주문 생성일 필터만으로 수집하지 않는다.</p>
+<h3>COL-04. 실패·중지·재시작과 이력</h3>
+<p>서버가 꺼져 예약 시각을 놓쳤다면 누락된 시각마다 같은 작업을 여러 개 실행하지 않고, 마지막 성공 범위부터 현재 기준시각까지 <strong>통합 보충 수집 1건</strong>을 구성한다. 조회 가능 기간을 넘긴 누락은 별도 확인 대상으로 표시한다. 마감이 지난 1차 발주는 자동으로 지난 회차에 저장하지 않고 다음 회차 정책이나 확인 절차를 적용한다.</p>
+<p>‘예약 일시중지’는 새 예약 발생을 막으며 수동 수집은 가능하다. 이미 실행 중인 수집을 강제로 중단하는 동작과 구분한다. 실행 중지 요청은 현재 반영 단위의 결과를 확정하고 진행점을 남긴 후 중단하며, 재시작 시 실제 반영 결과부터 대조한다.</p>
+<p>수집 화면에는 실행 방식(예약/수동/복구), 요청자 또는 예약 ID, 예정·요청·시작·종료시각, 계정·조회 범위, 후속 처리 범위, 주문/취소 건수·부수, 중복 제외·실패·재시도 결과를 표시한다. 설정·실행·기간 재수집 권한은 고객의 역할에 맞춰 관리한다. 예약 설정에 판매처 비밀번호를 노출하지 않는다.</p>
+<h3>COL-05. 실제 계정 구성과 반영 단계</h3>
+<p>2026.09.20 실행 중인 JBOOKS v1.0.0.94의 주문수집·취소주문수집에서 <strong>10개 판매처 그룹, 동일한 27개 계정 표시</strong>를 확인했다. 아래는 화면 구성이고 활성·인증·수집 성공이 검증된 목록은 아니다. 사용 여부·법인·권한·주문/취소 지원 범위를 계정별로 확정한다. ESM이라는 화면 그룹만으로 하위 판매처의 식별 키를 합치지 않는다. [E02·E03]</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>판매처 그룹</th>
+<th>화면 계정 표시</th>
+<th align="right">개수</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CJ 온스타일</td>
+<td>단일 계정 표시</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>11번가</td>
+<td>제이북스·팝북·봄봄북스·온누리북스</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>스마트스토어</td>
+<td>제이북스·팝북·봄봄북스·뿡뿡맘</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>쿠팡</td>
+<td>제이북스·봄봄북스·온누리북스·다담</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>롯데아이몰</td>
+<td>제이북스·팝북·봄봄북스·온누리북스·사이먼북스</td>
+<td align="right">5</td>
+</tr>
+<tr>
+<td>롯데온</td>
+<td>제이북스</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>ESM</td>
+<td>제이북스·봄봄북스</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>SSG</td>
+<td>제이북스·팝북·봄봄북스·온누리북스</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>패션플러스</td>
+<td>제이북스</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>보리보리</td>
+<td>제이북스</td>
+<td align="right">1</td>
+</tr>
+</tbody></table></div>
+<p>계정별로 주문 수신, 취소 수신, 정규화, 내부 반영, 재조회 대조의 진행점을 나눈다. 예약과 수동은 같은 계정 실행권을 사용한다. 필수 계정에서 취소 반영이 대기·충돌이면 수집 API가 성공했어도 해당 수요의 발주 완료 조건을 충족하지 못한다.</p>
+<p><strong>장애주문:</strong> 원천·계정·주문번호·주문순번·상품코드·오류 원인을 보존한다. 사람의 상품 연결 보정에는 변경 전후와 근거를 남기며 재처리는 동일 원천 행에 연결해 중복 수주를 만들지 않는다. ‘저장(F7)’이 있는 현재 보정 화면의 실제 DB 효과는 조사 대상이다.</p>
+<p><strong>취소 반영:</strong> 몰 주문상태와 제이북스 주문상태를 대조한 후 정상 반영·충돌·원주문 미확인을 구분한다. 현재 화면의 ‘출고중 → 미출고’와 ‘취소처리(F7)’는 별도 조작이다. 출고 상태 되돌림을 일반 자동 재시도에 포함하지 않는다. 수집·반영·대조의 완료 수량과 미처리 사유를 별도로 보여준다.</p>
+<h2 id="s04">04. 수요·세트·발주 부수 규칙</h2>
+<h3>Q01. 취소를 반영한 수요</h3>
+<p>판매처·계정·주문·행을 식별하고 주문 상태의 최신 유효 버전을 반영한다. 부분취소는 취소된 수량만 조정한다. 취소 통지가 출고·기존 처리 상태와 충돌하면 임의로 원복하지 않는다. 이미 발주 저장된 뒤 취소가 들어오면 기존 발주의 전송·잠금 상태를 대조한 변경 계획으로 처리한다.</p>
+<h3>Q02. 세트 구성과 재고 배분</h3>
+<p>원주문별 수요를 유지한 채 구성품 단위로 합산한다. <strong>서로 다른 정상 주문이 같은 ISBN이라는 이유로 중복 제거하지 않는다.</strong> 중복 제거의 기준은 원천 이벤트 키다.</p>
+<p>설계 검증 예: 세트 [1권, 2권] 1개와 [1권, 2권, 3권] 1개는 배분 전 낱권 수요가 1권 2부·2권 2부·3권 1부다. 완성 세트 재고를 먼저 사용할지, 주문 우선순위와 필요일을 어떻게 적용할지는 정책으로 확정한다. 같은 완성 세트와 그 구성품을 동시에 공급으로 세지 않는다.</p>
+<p>물리적 세트 조립을 기록할 때 구성품 감소와 완성 세트 증가가 함께 성공하거나 함께 실패해야 한다. 단순 계산용 구성품 전개와 실제 재고 조정을 구별한다. 취소 후 조립 재고를 자동 해체할지는 별도 정책 확인 없이 실행하지 않는다. 상품 코드 접두어 811/9 계열만으로 세트 유형을 확정하지 않는다.</p>
+<h3 id="stock-formula">Q03. 적정재고와 오늘 발주량을 분리한다</h3>
+<p>고객 추가 요청에 따라 <strong>이전 이력 + 최근 3주 주문을 이용한 적정재고 산식</strong>을 P0에 포함한다. 아래는 DB 표본으로 검증할 v0.2 산식 초안이며, 고객 데이터에 맞춰 추정한 계수나 운영 적용 결과가 아니다.</p>
+<p>‘적정재고’는 여기서 <strong>다음 보충 입고까지 새로 들어올 주문을 감당하기 위한 목표 재고포지션 S</strong>를 뜻한다. 물리적으로 창고에 항상 쌓아둘 수량, 현재 미출고 주문량, 오늘 발주 부수는 서로 다르다. 기존 제이북스의 ‘적정재고’ 컬럼 의미를 확인하기 전에는 산출한 S를 해당 컬럼에 그대로 덮어쓰지 않는다.</p>
+<h3>Q04. 최근 3주 주문 수요 + 이전 수요 보정</h3>
+<p>계산 단위는 발주 가능한 상품·판본·재고 위치다. 세트는 Q02의 구성품 배분 계약으로 변환하고, 완성 세트 판매량과 같은 구성품 수요를 이중 합산하지 않는다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>기호</th>
+<th>정의</th>
+<th>초기 비교 설정</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>W1</td>
+<td>어제까지 최근 1–7일 순주문 부수</td>
+<td>가장 최근 주</td>
+</tr>
+<tr>
+<td>W2</td>
+<td>어제까지 최근 8–14일 순주문 부수</td>
+<td>직전 주</td>
+</tr>
+<tr>
+<td>W3</td>
+<td>어제까지 최근 15–21일 순주문 부수</td>
+<td>그 이전 주</td>
+</tr>
+<tr>
+<td>d21</td>
+<td>최근 추세를 반영한 일평균 수요</td>
+<td>(0.50×W1 + 0.30×W2 + 0.20×W3) ÷ 7</td>
+</tr>
+<tr>
+<td>d_old</td>
+<td>최근 21일과 겹치지 않는 이전 84일의 순주문 합계 ÷ 84</td>
+<td>같은 상품·판본의 비교 가능한 완전한 기간</td>
+</tr>
+<tr>
+<td>d</td>
+<td>보정한 예상 일수요</td>
+<td>0.70×d21 + 0.30×d_old</td>
+</tr>
+</tbody></table></div>
+<pre><code class="language-text">d21 = (0.50 × W1 + 0.30 × W2 + 0.20 × W3) / 7
+d   = λ × d21 + (1 - λ) × d_old       # λ 초기 시험값 = 0.70
+</code></pre>
+<p><strong>3주는 수요를 관찰하는 기간이지, 21일치 재고를 무조건 확보한다는 뜻이 아니다.</strong> 50/30/20, λ=0.70, 이전 84일은 최근 추세와 장기 수준을 비교하기 위한 초기 시험 설정이다. 확정 정책은 단순 21일 평균 및 다른 가중치와 과거 재현 결과를 비교해 선택한다.</p>
+<p>순주문은 주문 건수가 아닌 <strong>상품 부수</strong>다. 고객 변심 등의 유효 취소는 원주문 발생일에 연결하여 차감하고, 늦게 온 취소를 취소 수신일의 음수 판매로 만들지 않는다. 공급 불가 때문에 취소된 수요는 일반 취소와 분리하여 품절 편향을 확인한다. 반품은 수요에서 일괄 차감하지 않고, 재판매 가능한 실물 입고가 확인될 때 공급에 반영한다.</p>
+<p>0부인 날도 수집·판매 가능 상태가 확인된 정상일이면 분모에 포함한다. 수집 누락일·판매 차단일·출시 전 날짜를 임의로 0으로 채우지 않는다. 오늘의 일부 시간 주문을 24시간 수요처럼 넣지 않고, 현재 확정 주문은 Q07의 B에 반영한다. 대량·행사 주문은 실제 확정 수요에 전량 유지하되 반복 수요 예측에 포함할지는 사유가 기록된 별도 정책으로 처리한다.</p>
+<p>이전 84일의 비교 가능한 주문 데이터가 없고 최근 21일만 완전하다면 <strong>λ=1인 최근 3주 전용 후보</strong>를 표시한다. 이전 기간이 없다는 이유로 d_old=0을 넣어 수요를 낮추지 않는다. 최근 21일도 불완전하거나 신간·개정판·판매 중단·심한 품절 구간이면 적정재고 변경은 보류하고, 확인된 실주문 부족분은 기존 검증 절차로 처리한다.</p>
+<h3>Q04-A. 실화면 집계와 산식 입력의 연결</h3>
+<p>발주업무에는 온라인 판매량 7·14·21일·누적과 오프라인 출고 7·14·21·28일이 별도로 표시된다. <strong>화면의 7/14/21 값을 W1/W2/W3에 그대로 대입하지 않는다.</strong> 같은 기준시각·대상·순수량의 최근 누적 C7/C14/C21이라고 확인된 경우만 W1=C7, W2=C14-C7, W3=C21-C14로 변환한다. 가능하면 원천 주문행을 겹치지 않는 7일 구간으로 직접 재집계하고 화면과 대조한다. [E01]</p>
+<p>집계 기준시각, 주문/취소/반품의 의미, 상품·판본·세트 단위를 먼저 확정한다. 차분 음수·기준 불일치를 임의로 0 처리하지 않는다. 온라인 주문과 오프라인 출고를 합산하려면 동일 수요 중복 여부부터 확인한다. 오프라인 예측을 제외하더라도 이미 확정된 주문·예약이 쓰는 공용 재고는 보호한다.</p>
+<p>세트 재고조정의 ‘세트 수주 조회(수주기간 3달)’는 21일 예측 기간과 별개다. 그 모드에서는 다른 검색 조건을 무시한다고 화면에 안내한다. 새 UI는 실제 적용되는 기간과 필터를 표시하고, 무시되는 입력은 비활성화하거나 명시한다. 기존 화면의 이 동작을 조용히 복제하지 않는다. [E05]</p>
+<h3>Q05. 이전 발주·입고 이력의 활용</h3>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>이전 자료</th>
+<th>산식에 사용하는 내용</th>
+<th>그대로 정답으로 쓰지 않는 내용</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>고객 주문·취소</td>
+<td>d_old, 수요 변동과 예측 오차</td>
+<td>취소/품절 원인 미분류 합계</td>
+</tr>
+<tr>
+<td>원발주·부분입고·잔량 종료</td>
+<td>거래처·요일·부수별 실제 입고 지연과 충족 시각</td>
+<td>10부 중 6부만 온 시각을 10부 전체의 입고 완료로 간주</td>
+</tr>
+<tr>
+<td>미송·배송·업체 확인</td>
+<td>유효 공급량과 도착 시각, 재주문 필요 여부</td>
+<td>미확인 잔량을 확정 입고로 간주</td>
+</tr>
+<tr>
+<td>과거 적정재고·수동 수정</td>
+<td>당시 목표와 신규 산식의 차이, 행사·상한·예외 이유</td>
+<td>이전 목표를 무조건 하한으로 유지</td>
+</tr>
+<tr>
+<td>과거 발주 부수</td>
+<td>재현 시 비교 결과, MOQ·묶음·수동 판단 이유</td>
+<td>평균 발주량을 일수요 또는 목표재고로 대입</td>
+</tr>
+</tbody></table></div>
+<h3>Q06. 보충기간과 안전재고</h3>
+<p><strong>H는 지금부터 ‘다음 발주 기회에 낸 주문이 사용 가능한 재고로 들어올 때’까지의 기간</strong>이다. 주기와 입고기간이 일정하면 H=L+R로 계산한다. L은 발주부터 사용 가능한 입고까지의 기간, R은 다음 발주 기회까지의 간격이다. 실제 구현은 마감·휴일·주말·택배·입고 후 처리시간을 달력에 적용한다. 주문이 주말에도 들어오므로 수요의 일 단위와 H의 달력 단위를 맞춘다.</p>
+<p>같은 상품도 당일 입고 거래처와 익일·택배 거래처의 H가 다르다. L은 현재 거래 조건과 원발주별 실제 입고 이력으로 정한다. 초기 비교에서는 유사 거래처/운송 경로의 지연 분포 90분위값을 보수적인 후보로 검토하되, 미입고·종료 사례를 제외한 ‘성공 건만의 평균’으로 낙관화하지 않는다. 표본 수·부분입고 충족률·아직 미종결인 건을 함께 표시하고 신뢰할 근거가 없으면 예정일을 자동 확정하지 않는다.</p>
+<p>안전재고는 반복 판매가 적은 책에 일률적으로 1부를 붙이거나 판매량의 일정 비율을 무조건 더하는 대신, <strong>같은 길이 H 동안의 과거 과소예측 오차</strong>를 사용한다.</p>
+<pre><code class="language-text">F_H(t)  = d(t) × H(t)
+e_H(t)  = t 이후 H 동안의 실제 신규 순주문 부수 - 당시 예측 F_H(t)
+SS_H    = ceil(max(0, Quantile_p(검증용 과거 e_H)))
+S       = ceil(F_H(현재) + SS_H)
+
+초기 시험 p = 0.90
+</code></pre>
+<p>과거 각 기준일 t의 예측은 그 시점 이전에 알 수 있었던 주문·취소·입고 정보로만 만든다. 안전재고 계산에는 H가 경과하고 결과를 대조할 수 있는 과거 구간만 사용한다. 분위수는 오차를 오름차순 정렬한 뒤 ceil(p×n)번째 값을 쓰는 방식으로 고정하여 구현별 차이를 없앤다. 겹치는 기간의 오차를 독립 표본처럼 과장하지 않고, 상품군 공유 여부와 유효 표본 수를 기록한다.</p>
+<p>p=0.90은 초기 비교용이며 90% 납기 준수나 서비스 수준을 보장하지 않는다. 입고 지연에 대한 L 후보와 수요 오차에 대한 SS는 별도로 검증한다. 오차 이력이 부족하면 승인된 동일 상품군의 SS 후보 또는 기존 검증 정책을 사용하고 <strong>상품별 검증 완료로 표시하지 않는다</strong>. 어느 것도 없으면 안전재고를 0으로 임의 지정하지 않고 목표 변경을 보류한다.</p>
+<p>목표 상한·행사 추가분·반품 불가 제한·예약 상품은 별도 정책 값으로 관리한다. 최근 주문이 드문 책은 승인된 주문 충당형 정책에서 미래 보충분 S=0을 사용할 수 있다. 장기 평균이나 올림 때문에 저회전 상품이 자동으로 항상 1부 이상 유지되지 않도록 적용 유형을 먼저 정한다.</p>
+<h3>Q07. 실제 발주 부수와 미송 차감</h3>
+<pre><code class="language-text">B       = 해당 보호기간 안에 충족해야 하는 현재 확정 미출고 수요
+I       = B를 충족하는 데 사용 가능한 물리 재고 총량
+P_valid = 필요 시점까지 도착이 확인되고 중복 배분되지 않은 기존 공급
+Q_raw   = max(0, B + S - I - P_valid)
+</code></pre>
+<p>이 식은 <strong>B의 예약량을 I에서 아직 차감하지 않은 총량 기준</strong>이다. 예약 차감 후 가용재고를 입력하면서 B를 다시 더하지 않는다. 다른 수요에 배분된 재고는 제외하고, 같은 공급을 B 충당과 보충에 두 번 쓰지 않는다. 미래 예측 F_H는 기준시각 이후 새로 접수될 수요이며, 이미 접수된 B와 구분한다. 장래 예약 주문은 필요일에 맞춰 별도 배분한다.</p>
+<p>기간 총량이 맞아도 오늘 필요한 주문에 내일 오는 물량을 배분할 수 없다. 실제 엔진은 <strong>필요일·입고일별 배분을 먼저 확인</strong>하고 이 식을 합계 대조에 쓴다. 도착일이 불명확한 유지 미송은 P_valid에 넣지 않되, 잔량을 무시하고 Q_raw를 새로 주문하지도 않는다. 기존 B02/C02의 확인 분기로 보낸다.</p>
+<p>거래처가 바뀌면 H·SS·S·Q를 다시 계산한다. L04에서 기준 거래처로 부족분을 잠정 산출하고, L07에서 공급처별 계산을 비교하여 하나의 조달 계획만 선택한다. 4개 거래처의 목표재고를 각각 합산해 주문하지 않는다. MOQ·포장 단위로 늘어난 부수는 S를 올려 숨기지 않고 별도 과잉분으로 표시한다.</p>
+<p><strong>0부 종료 조건 보강:</strong> L04의 잠정 Q=0만으로 조회·후보 평가를 종료하지 않는다. 현재 정책과 거래처 조건이 유효하고 해당 보호기간의 시점별 수요·공급이 충족된 경우에만 무발주로 확정한다. 조건 만료·미확인이면 대체 후보의 H·SS·S·Q를 평가한다. 유효한 무발주 정책에 더 느린 거래처를 임의 적용하여 불필요한 재고를 만들지도 않는다.</p>
+<h3>Q08. 계산 예시 — 실제 고객 데이터 아님</h3>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>입력</th>
+<th>예시 값</th>
+<th>계산/의미</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>W1 / W2 / W3</td>
+<td>14 / 7 / 7부</td>
+<td>d21=(7+2.1+1.4)/7=1.50부/일</td>
+</tr>
+<tr>
+<td>이전 84일 순주문</td>
+<td>84부</td>
+<td>d_old=1.00부/일</td>
+</tr>
+<tr>
+<td>λ</td>
+<td>0.70</td>
+<td>d=0.70×1.50+0.30×1.00=1.35부/일</td>
+</tr>
+<tr>
+<td>L / R</td>
+<td>2일 / 1일</td>
+<td>일정한 달력 조건을 가정, H=3일</td>
+</tr>
+<tr>
+<td>오차 90분위값</td>
+<td>1.8부로 가정</td>
+<td>SS=ceil(1.8)=2부; 실제 이력 추정값 아님</td>
+</tr>
+<tr>
+<td>적정재고 S</td>
+<td>7부</td>
+<td>ceil(1.35×3+2)=7</td>
+</tr>
+<tr>
+<td>현재 미출고 B / 물리 재고 I / 확정 공급 P_valid</td>
+<td>4 / 3 / 2부</td>
+<td>모든 수요·공급 시점이 맞는다고 가정</td>
+</tr>
+<tr>
+<td>오늘 발주 후보 Q_raw</td>
+<td>6부</td>
+<td>max(0,4+7-3-2)=6</td>
+</tr>
+</tbody></table></div>
+<p>따라서 이 예시의 <strong>적정재고 목표는 7부, 실제 발주 후보는 6부</strong>다. 공급 2부의 도착일이 불명으로 바뀌면 자동 발주 후보가 8부로 확정되는 것이 아니라 미송 확인으로 전환된다.</p>
+<h3>Q09. 산식 검증과 적용</h3>
+<p>가중치·이전 기간·λ·안전재고 분위수는 상품 하나의 21일 데이터에 과적합시키지 않는다. 이전 이력이 충분한 상품군에서 <strong>21일 단순평균 / 최근 주 가중평균 / 이전 이력 혼합</strong>을 같은 날짜 조건으로 비교하고, 마지막 평가 기간은 계수 선택에 사용하지 않는다. 미래 정보를 쓰지 않는 과거 시점별 재현 원칙을 적용한다. <a href="https://otexts.com/fpp3/tscv.html">OTexts: 시계열 교차검증</a></p>
+<p>평가 항목은 일수요 MAE, 필요일까지 충족하지 못한 부수, 실제 평균 보유재고·장기 체류·반품, 발주 부수, 담당자 수정 이유다. 판매 0인 날짜가 많으므로 비율 오차만으로 평가하지 않는다. 과거 발주량과 같다는 이유만으로 정답으로 판정하지 않는다. 당시 입력 상태를 복원할 수 없다면 결과는 참고 재현이며 성능 입증으로 표시하지 않는다.</p>
+<p>저장할 계산 근거는 W1/W2/W3, d_old의 기간·완전성, 가중치·λ, d, 거래처·달력·H, 오차 표본 범위·n·p·SS, S, B/I/P_valid, Q_raw, MOQ 조정, 보류 사유, 정책 버전이다. ‘7부’ 옆에서 어떤 주문 기간과 공급 조건으로 나왔는지 설명할 수 있어야 한다.</p>
+<p>재고포지션을 목표까지 보충하는 구조는 정기 검토 재고정책의 기본 개념을 참고했다. 여기의 가중치·취소 처리·미송 보호·데이터 부족 규칙은 <strong>제이북스용 설계 제안</strong>이며, 해당 문헌이 이 운영 환경의 성능을 보증하는 것은 아니다. <a href="https://www.jiem.org/index.php/jiem/article/view/297/131">Babiloni 외: 정기 검토 재고정책의 정의</a></p>
+<h2 id="s05">05. 미송 로직보드</h2>
+<p><strong>‘미송을 관리하는 거래처인가’와 ‘당일·익일·며칠 뒤 입고되는가’는 별도 조건이다.</strong> 택배 여부도 입고 경로 조건이며 잔량 유지 여부를 대신하지 않는다. 판단 단위는 상품 × 거래처 × 원발주 행이다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>규칙</th>
+<th>10부 발주·6부 입고 후 상태</th>
+<th>잔량 4부의 취급</th>
+<th>신규 발주 판단</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B01</td>
+<td>거래처가 잔량 유지, 필요일까지 입고 확인</td>
+<td>유효 공급으로 배분 가능</td>
+<td>배분 후 남은 필요량만 발주</td>
+</tr>
+<tr>
+<td>B02</td>
+<td>잔량 유지, 예정일 불명 또는 필요일 이후</td>
+<td>정시 공급으로는 계산하지 않음; 중복 위험은 유지</td>
+<td>대체 구매·기존 잔량 정리 여부를 확인; 자동 중복 발주 금지</td>
+</tr>
+<tr>
+<td>B03</td>
+<td>잔량 종료가 확인됐고 재주문이 필요한 업체</td>
+<td>기존 4부는 미래 공급에서 제외</td>
+<td>최신 주문·취소·재고로 다시 계산; 무조건 4부 재발주하지 않음</td>
+</tr>
+<tr>
+<td>B04</td>
+<td>잔량 4부가 배송 중</td>
+<td>실물 입고로 올리지 않고 배송 공급으로 추적</td>
+<td>검증된 도착일과 수요 필요일을 대조</td>
+</tr>
+<tr>
+<td>B05</td>
+<td>6부 입고가 어느 원발주분인지 불명</td>
+<td>임의로 이전·당일 발주에 매칭하지 않음</td>
+<td>관련 원발주와 신규 발주를 확인 목록으로 이동</td>
+</tr>
+<tr>
+<td>B06</td>
+<td>지연·품절 의심, 업체 답변 없음</td>
+<td>‘의심’과 확정 종료를 구분</td>
+<td>경과일 알림·재조회; 기간 초과만으로 재발주하지 않음</td>
+</tr>
+</tbody></table></div>
+<p>예: 잔량 4부가 종료됐더라도 주문 취소로 실제 부족분이 3부가 됐다면 재발주 후보는 3부다. 유지 중인 잔량을 대체 구매할 때는 기존 발주의 종료·수정 또는 별도로 승인된 중복 부담을 기록해야 한다.</p>
+<p>북센의 지연 확인 경험, 제이엔피의 1영업일 판단은 초기 <strong>확인 알림 후보</strong>로 둔다. 공급처별 영업일·마감·예외를 검증하기 전에 자동 종료 규칙으로 쓰지 않는다. 전화·팩스·이메일 확인 내용이 DB에 없다면 담당자 확인 사실과 확인시각을 별도로 기록한다. [V56 00:11–04:32, 14:27–15:00; V57 13:35–17:06]</p>
+<h3>B06. 기존 거래처 마스터 매핑</h3>
+<p>매입처관리에서 <strong>주문유효기간·입고 시일·발주 마감시간·발주방식·거래구분·거래법인</strong>을 확인했다. 법인·거래처 코드·판매 계정을 연결하고 기존 값의 의미와 완전성을 먼저 조사한다. 공통값은 조사된 운영 데이터에 연결하고, 자체 저장소에는 검증된 해석·상품 예외·적용기간·확인 근거를 관리한다. 이름만 같은 거래처를 병합하지 않는다. [E06]</p>
+<p>주문유효기간과 입고 시일은 별개다. 전자는 접수 조건인지 잔량 유지 조건인지 검증해야 하며 <strong>유효기간 만료를 미송 소멸로 간주하지 않는다.</strong> 팩스·EMAIL·카톡·오더피아·사이트는 발주 전송 수단이고 택배 여부와 다른 축이다. 선택지의 존재가 실제 값의 정확성을 증명하지 않는다.</p>
+<p>거래처별 미입고 화면은 발주일과 입고일, 발주·입고 이력을 별도로 제공하지만 원발주 행과 부분입고 연결은 이번 조회로 확인하지 못했다. 10/6/4 및 연속 발주 실사례에 대해 연결 키·수량 보존·잔량 상태·필요일을 대조한 후 자동 판단을 개방한다. [E04]</p>
+<h2 id="s06">06. 크롤링 대상 선정과 거래처 결정</h2>
+<h3>C01–C06. 대상 선정 순서 — 초안 정책</h3>
+<p>아래 순서는 신규 도구의 설계 제안이다. 운영자가 말한 ‘65’와 예외를 검증 가능한 정책으로 분리한다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>순서·규칙</th>
+<th>조건</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 · C01 필요량</td>
+<td>유효한 정책·거래처 보호기간과 시점별 공급 대조로 필요량 0 확정</td>
+<td>충족 근거 저장 후 제외; 기준 거래처 조건 무효/미확인 시 잠정 0만으로 종료하지 않음</td>
+</tr>
+<tr>
+<td>2 · C02 미송 보호</td>
+<td>잔량 유지·종료가 불명, 배분 충돌</td>
+<td>자동 확정 보류; 읽기 전용 조회는 확인 자료로 수행 가능</td>
+</tr>
+<tr>
+<td>3 · C03 정보 유효성</td>
+<td>공급률 미확인·기한 만료·견적 충돌, 기존 거래처 품절·절판 또는 공급 불명</td>
+<td>신규 조회 필요; 실패·미조회는 품절로 바꾸지 않음</td>
+</tr>
+<tr>
+<td>4 · C04 검증된 예외</td>
+<td>상품·출판사·거래처별 예외가 유효하고 최신 필수 조건을 충족</td>
+<td>승인된 예외 정책 적용; 예외 ID·기한·근거 기록</td>
+</tr>
+<tr>
+<td>5 · C05 일반 후보</td>
+<td>예외가 없고 현재 공급률이 65와 다름</td>
+<td>4개 공급처 비교 후보; 실제 단위·적용 범위는 DB 대조 후 확정</td>
+</tr>
+<tr>
+<td>6 · C06 생략 후보</td>
+<td>공급률 65, 정보 최신, 거래 가능·필요일·조건 충족</td>
+<td>기존 조건 사용 후보; 65라는 이유만으로 생략하지 않음</td>
+</tr>
+</tbody></table></div>
+<p>59·63처럼 이미 유리한 거래처를 유지하는 사례나 특정 출판사 예외는 존재할 수 있다. 공급률 숫자 하나로 그 예외를 추정하지 않는다. 실제 DB가 65, 0.65, 코드 중 무엇을 저장하는지 확인하고 정규화한다. 값·비교 단위를 검증하지 못하면 자동 결정하지 않는다. [V55 31:14–36:03]</p>
+<h3>C07. 조회 계약</h3>
+<p>북센·교보·예스24·알라딘은 각각 독립 어댑터로 구현한다. 기존 화면에서 세 곳이 자동 조회된다는 관찰은 새 도구에서 같은 권한·경로를 쓸 수 있다는 증거는 아니다. 허용된 API·조회 화면·파일 경로와 계정 권한을 먼저 확인한다.</p>
+<p>조회 결과에는 상품 식별자·ISBN·판본·세트 여부, 공급률/견적가의 기준, 조회시각, 재고·공급 상태, 예상 입고일, 최소 부수, 배송비·반품 조건, 원천 근거를 남긴다. 같은 판본인지 확인하지 못하면 가격 비교를 하지 않는다.</p>
+<p>알라딘은 영상에서 Excel과 별도 조회 계정을 사용했다. ‘파일에 없음’, ‘성인 인증 등 접근 실패’, ‘조회 실패’, ‘품절’을 다른 상태로 보관한다. 자동 파일 취득이 검증되지 않아 수동 업로드를 썼다면 해당 건은 수동 보조 처리다. 기존 주문 장바구니를 비우거나 수정하는 조회 방식은 이번 구현에 포함하지 않는다. [V56 19:22–26:08; V57 11:13–13:35]</p>
+<p><strong>화면 교차 확인:</strong> 크롤링 필터·F3 건별 조회·공급처별 상태/율/재고와 알라딘 엑셀 업로드 경로를 확인했다. 조회 대상 선정식, ‘65’의 실제 필드 의미, 공급률·할인율·입고율의 단위는 미확인이다. 파일과 웹 결과가 함께 쓰이면 상품 식별·기준시각·버전·우선순위를 명시한다. UI 버튼 존재를 독립 자동 수집 가능성의 증거로 보지 않는다. [E01·E07]</p>
+<h3>C08. 거래처 비교 순서 — 정책 확정 필요</h3>
+<p>후보는 네 도매 공급처로 한정하지 않는다. 상품·출판사에 연결된 <strong>직거래처와 도매 거래처</strong>를 모두 조사하고 승인된 우선순위에 따라 구성한다. 직거래/도매는 거래 관계, 당일/익일/그 이후는 입고 시점, 택배는 운송 방식, 미송 유지/종료는 잔량 정책이다. 서로 독립된 속성으로 저장한다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>후보 구성</th>
+<th>적용 조건</th>
+<th>다음 판단</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>직거래 후보</td>
+<td>상품·출판사 연결이 유효하고 해당 계정의 거래가 가능</td>
+<td>부수·마감·입고일·미송·거래 조건 검증 후 직거래 정책 평가</td>
+</tr>
+<tr>
+<td>도매 후보</td>
+<td>도매 배정 대상이거나 승인된 대체 조달 조건에 해당</td>
+<td>크롤링 지정 규칙에 따라 네 공급처 등의 후보를 비교</td>
+</tr>
+<tr>
+<td>직거래 공급 불가</td>
+<td>품절·거래 불가·필요일 미충족</td>
+<td>도매 대체가 허용되는지 확인; 기존 직거래 미송을 임의로 무시하지 않음</td>
+</tr>
+<tr>
+<td>둘 다 유효</td>
+<td>복수 거래처의 필수 조건 충족</td>
+<td>공급률만으로 임의 결정하지 않고 검증된 직거래 우선·가격·도착 정책 적용</td>
+</tr>
+</tbody></table></div>
+<ol>
+<li>상품·판본 일치, 계정 거래 가능, 공급·입고일 조건을 확인한다.</li>
+<li>최소 부수·포장 단위·반품 제한 등 필수 조건을 적용한다.</li>
+<li>검증된 공급률·배송비·부수·도착 시점을 비교한다. 세금·정가·입고 기준이 다르면 금액을 단순 비교하지 않는다.</li>
+<li>동률이면 승인된 도착 시간·거래처 우선순위로 결정한다.</li>
+<li>후보별 H·SS·S·Q를 계산하고 MOQ·포장·부수별 견적·납기를 재평가한다. 거래처×계정×배송/입고 묶음의 합산 조건까지 대조하여 선택 계획만 저장한다. 유한한 견적 구간을 평가하고 조건이 불명·불안정하면 보류한다. 전 상품 전역 최저가 최적화는 P0 필수 범위가 아니다.</li>
+<li>조회 누락, 견적 충돌, 손실 가능, 조건 불명은 재조회 또는 확인 목록으로 보낸다.</li>
+</ol>
+<p>일부 공급처가 조회에 실패한 상태에서 성공한 곳 중 최저가를 곧바로 확정하지 않는다. 해당 공급처가 비교에서 제외될 수 있는 근거 또는 승인된 대체 정책이 필요하다. 전체 재고가 0이어도 주문을 넣어 확보하는 현장 사례는 ‘입고 확정’과 분리하며, 그 대기 주문 정책이 승인된 경우에만 저장한다.</p>
+<p>금요일 도착과 공급률 차이, 예스24 배송비 8만원의 입고 기준, 알라딘 부수별 반품 조건은 <strong>규칙 후보</strong>다. 경계값·합산 기간·계정·분할 입고 조건을 확인하기 전에는 하드코딩하지 않는다. [V56 04:56–08:48, 10:20–10:46, 18:40–19:22, 26:38–28:58]</p>
+<h2 id="s07">07. 기능 요구사항</h2>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>P0 요구사항</th>
+<th>완료 조건</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span class="req-id">FR-01</span></td>
+<td>예약·수동 실행과 대상 관리</td>
+<td>시각/요일/간격·계정·예약 사용/중지, 지금 수집·실패/기간 재수집 지원; 수집만/1차 발주까지 구분</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-02</span></td>
+<td>공통 주문·취소 수집·상태 반영</td>
+<td>예약/수동 동일 모듈과 계정별 진행점 사용; 이벤트 중복·부분취소·역순 도착·늦은 취소·출고 충돌 처리</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-03</span></td>
+<td>세트·낱권 배분과 조정</td>
+<td>공유 낱권을 합산하고 원수요까지 추적; 실제 수불의 원자성 보장</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-04</span></td>
+<td>미송·입고 대조</td>
+<td>원발주별 잔량·종료·배송·예정일을 보관하고 중복 공급 배분 방지</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-05</span></td>
+<td>적정재고·발주 필요량 산출</td>
+<td>이전 이력·3주 주문으로 d·H·SS·S를 산출하고 미출고·재고·유효 공급으로 Q 계산; 계수·근거·보류 사유 저장</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-06</span></td>
+<td>크롤링 대상 지정</td>
+<td>C01–C06의 정책 버전과 선정·제외 이유를 상품별 저장</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-07</span></td>
+<td>4개 공급처 조회</td>
+<td>공급률·가용성·시각·거래 조건을 동일 상품 기준으로 비교; 실패와 품절 분리</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-08</span></td>
+<td>거래처·부수 확정</td>
+<td>직거래·도매 후보 구성 후 필수 조건과 우선순위 적용; 불명 조건은 보류</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-09</span></td>
+<td>1차 발주 저장·대조</td>
+<td>제이북스에서 거래처·부수·회차가 일치하며 후속 전송을 유발하지 않음</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-10</span></td>
+<td>예외 확인과 변경 이력</td>
+<td>이유별 목록, 영향 수량, 원천 근거, 담당자 입력과 재계산 이력 제공</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-11</span></td>
+<td>재시작·동시 작업 보호</td>
+<td>중단 지점 복구, 중복 저장 방지, 수동 변경 보존, 충돌 재계산</td>
+</tr>
+<tr>
+<td><span class="req-id">FR-12</span></td>
+<td>결과·성과 보고</td>
+<td>수집 완전성·저장/보류/발주 없음·수동 보조·소요시간을 구분하여 집계</td>
+</tr>
+</tbody></table></div>
+<h2 id="s08">08. 사용자 화면과 확인 흐름</h2>
+<p><strong>사용자:</strong> 오전 발주 담당자, 정책을 검토하는 업무 책임자, 수집·연결 상태를 관리하는 운영자. 실제 권한과 담당자는 고객 조직에 맞춰 지정한다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>화면</th>
+<th>핵심 질문</th>
+<th>주요 내용·행동</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S01 오전 현황·수집</td>
+<td>지금 어디까지 끝났고 무엇을 실행할 수 있나?</td>
+<td>예약 설정·다음 실행, 지금 수집·실패/기간 재수집, 실행 범위 선택, 계정별 수집 상태와 발주 상태 분리, 마감·확인 목록</td>
+</tr>
+<tr>
+<td>S02 상품 판단</td>
+<td>왜 이 거래처에 몇 부인가?</td>
+<td>3주/이전 수요→보충기간·안전재고→목표재고, 원주문→세트→재고·미송 배분→발주 부수, 계수·값·시각·변경 이유</td>
+</tr>
+<tr>
+<td>S03 공급처 비교</td>
+<td>크롤링 지정 이유와 실제 선택 근거는?</td>
+<td>네 공급처의 공급률·재고·도착·최소 부수·배송·반품·조회시각, 실패/제외 이유, 선택 근거</td>
+</tr>
+<tr>
+<td>S04 미송 확인</td>
+<td>이 잔량을 기다려도 되나?</td>
+<td>원발주별 수량·입고·잔량·배송·확인 사실, 오늘 발주 제외/기간 필터, 업체 답변과 유효시각</td>
+</tr>
+<tr>
+<td>S05 실행 이력</td>
+<td>수정·재시작 후 중복 없이 반영됐나?</td>
+<td>입력·정책 버전, 수동 수정 이유, 저장 키·대조 결과, 실패 단계와 재처리 결과</td>
+</tr>
+</tbody></table></div>
+<p>확인 흐름은 <strong>이유 선택 → 원천 근거 확인 → 사실/정책 입력 → 영향 항목 재계산 → 저장 전 결과 확인</strong>이다. 일괄 처리는 동일 조건에 해당하는 행만 묶는다. ‘미송 업체’라는 이유만으로 서로 다른 원발주를 일괄 종료하지 않는다.</p>
+<p>수량·거래처 수동 수정은 이전 값과 수정 이유를 남긴다. 다음 자동 실행이 이를 덮어쓰지 않는다. 수정 내용이 이후 정책 추천 자료가 될 수 있지만 검토 없이 전체 거래처의 규칙으로 자동 학습하지 않는다.</p>
+<h2 id="s09">09. 데이터 계약과 자체 구현 구조</h2>
+<div class="architecture" aria-label="자체 구현 아키텍처"><div class="arch-input"><div><small>SALES CHANNELS</small><b>주문 · 취소</b></div><div><small>ORACLE</small><b>상품 · 재고 · 발주 · 입고</b></div><div><small>SUPPLIERS</small><b>견적 · 재고 · 거래 조건</b></div></div><div class="arch-arrow">↓</div><div class="arch-row"><b>자체 수집 워커 · 읽기 어댑터</b><span>계정별 진행점 · 원천 키 · 기준시각</span></div><div class="arch-arrow">↓</div><div class="arch-row"><b>독립 작업 저장소 + 규칙 엔진</b><span>세트 → 공급 배분 → 필요량 → 대상 선정 → 거래처·부수</span></div><div class="arch-mid"><div><b>검토 UI ↔ 재계산</b><span>미송 확인 · 공급처 비교 · 수동 수정</span></div><div><b>진행·결정 이력</b><span>원천 근거 · 정책 버전 · 성과 측정</span></div></div><div class="arch-arrow">↓</div><div class="arch-output"><b>최신 상태 검증 → 자체 저장 모듈 → Oracle 대조</b><span>최종 산출: 제이북스에서 조회 가능한 1차 발주</span></div></div>
+<p>단일 책임의 모듈로 분리하되 초기부터 여러 서버·서비스를 전제로 하지 않는다. 애플리케이션 런타임, 작업 저장소, 배포 위치는 접근 방식·수집 지원·Oracle 호환성 시험 후 정한다. 원천 주문·조회 데이터는 필요한 범위만 저장하고 화면·로그의 개인정보 및 인증정보 노출을 제한한다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>논리 데이터</th>
+<th>최소 계약</th>
+<th>우선 조사 방법</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>실행·계정</td>
+<td>실행 ID, 예약 ID/버전·예정시각·시간대, 실행 방식·요청자·범위, 회차·기준시각·계정, 주문/취소 진행점·완전성</td>
+<td>활성 계정·수집 이력·누락 구간·중복 요청 대조</td>
+</tr>
+<tr>
+<td>주문·취소</td>
+<td>판매처/계정/원주문/행 키, 상태·수량·버전, 취소·출고 관계</td>
+<td>DB와 판매처 원천 표본 연결</td>
+</tr>
+<tr>
+<td>상품·세트</td>
+<td>상품 키, ISBN·판본, 구성 수량, 효력 기간, 재고 단위</td>
+<td>구성표·수불·화면 표본 대조</td>
+</tr>
+<tr>
+<td>재고·배분</td>
+<td>물리 재고, 예약·배분, 목표재고 S와 계산 근거, 기준시각</td>
+<td>같은 시각의 주문·수불 및 예약 차감 전후 정의 대조</td>
+</tr>
+<tr>
+<td>공급·미송</td>
+<td>원발주 행, 발주/입고/취소/종료 잔량, 배송·예정일</td>
+<td>연속 발주·부분입고 사례 추적</td>
+</tr>
+<tr>
+<td>거래처·견적</td>
+<td>정책·유효기간, 계정·조회시각, 공급률 기준, 달력·입고기간·조건</td>
+<td>DB 이력 + 현재 견적·계약 및 부분입고 충족 시각 확인</td>
+</tr>
+<tr>
+<td>결정·저장</td>
+<td>수요 배분 키, 규칙 버전, 선택 근거, 제이북스 키</td>
+<td>저장 전후·트리거·전송 상태 대조</td>
+</tr>
+</tbody></table></div>
+<p>Oracle 11g, Windows Server 2019, KO16MSWIN949, NOARCHIVELOG, RAM 32GB는 <strong>고객 제공 정보이며 실측하지 않았다</strong>. 정확한 버전·클라이언트 호환성·문자 변환·백업/복구 절차를 시험한다. ‘다국어 불가’라는 표만으로 모든 컬럼 유형의 문자 지원을 단정하지 않는다. 접속 주소·비밀번호를 PRD에 보관하지 않는다. 제공 자료의 S6 접근 조건은 의미·승인 절차를 고객 측에서 확인할 항목이다.</p>
+<p>DB에서 구조·상태·과거 결과를 우선 확인한다. DB에 기록되지 않은 <strong>전화로 확인한 잔량 유지, 당일 견적, 계약 변경, 담당자의 선택 이유</strong>는 거래처 자료와 표본 인터뷰로 보완한다. 이 차이를 데이터 조사표에 남긴다.</p>
+<h3>저장 의도와 변경 계약</h3>
+<p>안정적인 intent_id와 revision을 사용하며 run_id는 시도 이력으로만 남긴다. 미전송 1차 초안은 확정 입고 P_valid와 별도로 관리한다. 실제 재고·확정 공급 기준의 총 필요 계획과 동일 범위 미종결 초안을 대조해 유지/수정/철회 후보를 만든다. 같은 수요와 적정재고 보충량을 새 실행마다 다시 발주하지 않는다.</p>
+<p>6부 저장 후 동일 입력이면 6부를 유지한다. 필요량이 4부가 되면 미전송·미잠금 상태의 기존 의도에 4부 변경안을 만든다. 전송/잠금 이후는 자동 수정하지 않고 담당자 검토로 보낸다. 자기 초안을 P_valid로 차감해 자기 계획을 취소하는 재계산도 금지한다.</p>
+<p>업무 키·버전을 운영 반영과 같은 트랜잭션에서 남기고 유일성을 보장할 수 있는지 조사한다. 불가능하고 결과를 유일하게 식별할 수도 없다면 불명 쓰기 자동 재시도를 열지 않는다. 실행권 만료 후 구 워커의 쓰기도 현재 토큰/버전 검증으로 차단한다. 수동 잠금은 덮어쓰기를 막으며 입력·정책 변화나 확인 사실 만료 시 재검토 대상으로 전환한다.</p>
+<p>상세 계약·배송 합산·복구·정책 버전과 현장 결정표는 <strong>기획 통합본 v1.1의 04~10절</strong>을 함께 적용한다. 논리 필드명은 실제 Oracle 객체명이 아니다.</p>
+<h3>실제 발주 회차와 수정 경로</h3>
+<p>발주 타임 목록에서 08·10·11·12·14·16·17·18 등의 값을 확인했다. 2026.09.18 - 16 한 회차 조회는 5개 행을 반환했다. 셀 수량·가격은 접근성 텍스트로 확인하지 못했으며 수치 검증에 사용하지 않았다. <strong>회차를 10/18 둘로 고정하거나 코드값을 시각으로 해석하지 않는다.</strong> 운영 회차 키·업무일·법인·수요 범위를 확인해 intent_id, revision, run_id와 구분한다. [E07·E08]</p>
+<p>발주업무 저장(F7) 외에 상세의 거래처 일괄 변경·수정·복사·삭제 경로가 보인다. 수정 즉시 저장 여부, 동일 행을 바꾸는 다른 화면, 트리거·잠금·후속 전송을 조사한다. UI 컨트롤 ID는 Oracle 테이블·컬럼명이 아니다. 자체 쓰기는 조사한 원자적 반영 단위와 조건부 변경·재조회 대조 계약을 충족해야 한다.</p>
+<h2 id="s10">10. 저장·실패·재실행 계약</h2>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>설계 요구</th>
+<th>검증할 결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span class="req-id">NFR-01</span> 수량 보존</td>
+<td>원수요·세트 변환·배분·발주 사이의 수량을 추적</td>
+<td>중복 차감·중복 공급·음수 잔량을 검증에서 차단</td>
+</tr>
+<tr>
+<td><span class="req-id">NFR-02</span> 멱등성</td>
+<td>예약 발생·원천 이벤트·저장 의도에 안정적인 키 사용; 계정별 수집 실행권</td>
+<td>예약/수동이 겹쳐도 중복 반영하지 않고, 같은 수요 배분을 다시 발주하지 않음</td>
+</tr>
+<tr>
+<td><span class="req-id">NFR-03</span> 동시성</td>
+<td>결정 시점과 저장 시점의 주문·재고·미송·수동 수정 버전 비교</td>
+<td>새 취소·입고·수정이 있으면 영향 범위 재계산</td>
+</tr>
+<tr>
+<td><span class="req-id">NFR-04</span> 응답 유실</td>
+<td>저장 결과 불명 시 업무 키로 먼저 조회·대조</td>
+<td>성공했는데 응답만 사라진 저장을 재삽입하지 않음</td>
+</tr>
+<tr>
+<td><span class="req-id">NFR-05</span> 부분 실패</td>
+<td>단계별 진행점과 실제 DB 결과를 대조하여 복구</td>
+<td>전체 수집부터 다시 돌려 이미 반영한 처리를 중복 수행하지 않음</td>
+</tr>
+<tr>
+<td><span class="req-id">NFR-06</span> 저장 경계</td>
+<td>주문·취소·수불·발주의 트랜잭션 경계를 시험 DB에서 확인</td>
+<td>세트 조정의 반쪽 반영 없음; 발주 저장이 외부 전송을 유발하지 않음</td>
+</tr>
+<tr>
+<td><span class="req-id">NFR-07</span> 추적성</td>
+<td>입력·정책·결과·수정자·시각·사유를 연결</td>
+<td>저장된 행에서 원주문과 사용 견적으로 역추적 가능</td>
+</tr>
+<tr>
+<td><span class="req-id">NFR-08</span> 운용</td>
+<td>제한 속도·재시도·시간 초과·마감·예약 중지·실행 중지·누락 예약 복구</td>
+<td>공통 대기열, 통합 보충 수집, 안전한 진행점 복구; 수동/예약/복구 이력 표시</td>
+</tr>
+</tbody></table></div>
+<p>수집과 외부 조회 전체를 장시간 DB 트랜잭션 하나로 묶지 않는다. 단기 저장 단위와 재시작 대조를 설계한다. 전체 실행의 중단이 이미 커밋한 정상 거래를 자동 취소하는 동작으로 이어져서는 안 된다. 저장 경계에 자동 전송 트리거가 존재한다면 분리가 검증되기 전에는 자동 저장을 개방하지 않는다.</p>
+<h2 id="s11">11. 수용 테스트</h2>
+<p>아래 숫자는 시험용 예시이며 현장의 실제 주문으로 오인하지 않는다. 필요일·정책·재고를 고정한 시험 환경에서 결과와 근거를 함께 검증한다.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>사례</th>
+<th>기대 결과</th>
+<th>연결</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span class="req-id">AT-01</span></td>
+<td>같은 주문/취소 이벤트를 재수신</td>
+<td>각 이벤트는 한 번 반영, 수요가 추가 증감하지 않음</td>
+<td><span class="req-id">FR-02</span>, <span class="req-id">NFR-02</span></td>
+</tr>
+<tr>
+<td><span class="req-id">AT-02</span></td>
+<td>주문 5부 중 2부 부분취소; 취소 후 오래된 주문 이벤트 도착</td>
+<td>최신 유효 수요 3부 유지; 출고 충돌 시 보류</td>
+<td><span class="req-id">FR-02</span>, Q01</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-03</span></td>
+<td>필수 계정 한 곳 수집 실패, 영향 상품 불명</td>
+<td>전체 성공 표시 금지; 범위 분리 전 자동 저장 보류</td>
+<td><span class="req-id">FR-01</span>, <span class="req-id">FR-12</span></td>
+</tr>
+<tr>
+<td><span class="req-id">AT-04</span></td>
+<td>[1,2] 세트 1개 + [1,2,3] 세트 1개, 재고 0</td>
+<td>낱권 수요 2·2·1; 같은 ISBN의 정상 수요 보존</td>
+<td><span class="req-id">FR-03</span>, Q02</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-05</span></td>
+<td>완성 세트와 조립 재고 공존; 세트 수불 중 오류 주입</td>
+<td>같은 재고를 두 번 사용하지 않음; 수불 전부 성공 또는 전부 실패</td>
+<td><span class="req-id">FR-03</span>, <span class="req-id">NFR-01</span>/06</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-06</span></td>
+<td>10부 중 6부 입고, 잔량 4부 유지·정시 입고 확인, 남은 수요 4</td>
+<td>잔량으로 충족; 신규 발주 0</td>
+<td><span class="req-id">FR-04</span>, B01</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-07</span></td>
+<td>같은 사례에서 잔량 종료 확인, 취소 후 실제 부족 3</td>
+<td>유효 공급에서 기존 잔량 제외; 신규 발주 후보 3</td>
+<td><span class="req-id">FR-04</span>/05, B03</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-08</span></td>
+<td>잔량 유지하지만 도착일 불명; 연속 발주 입고 매칭도 불명</td>
+<td>확정 입고로 계산하지 않음; 자동 중복 발주 금지·확인 목록 생성</td>
+<td><span class="req-id">FR-04</span>, B02/05</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-09</span></td>
+<td>공급률 65이나 견적 만료; 공급률 63인 검증된 예외</td>
+<td>앞 건은 재조회, 뒤 건은 유효 조건 안에서 예외 적용; 규칙 근거 저장</td>
+<td><span class="req-id">FR-06</span>, C03/04</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-10</span></td>
+<td>알라딘 파일에 ISBN 없음 또는 판본 불일치, 다른 곳 가격은 정상</td>
+<td>누락을 품절로 바꾸지 않음; 비교 미완료 상태, 승인된 제외 정책 없으면 보류</td>
+<td><span class="req-id">FR-07</span>/08, C07/08</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-11</span></td>
+<td>조회 공급률과 실제 견적 충돌, 배송비/반품 조건 미확인</td>
+<td>최저 공급률만으로 확정하지 않음; 충돌 근거 표시</td>
+<td><span class="req-id">FR-08</span>, C08</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-12</span></td>
+<td>필요량 2, 후보 최소 부수 3, 상한·배송비 정책 미정</td>
+<td>임의로 3부 주문하지 않음; 대체 후보 또는 담당자 확인</td>
+<td><span class="req-id">FR-05</span>/08, Q03</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-13</span></td>
+<td>계산 후 새 취소·입고 또는 담당자 수동 수정 발생</td>
+<td>변경 탐지 후 재계산/보류; 수동 저장 덮어쓰기 없음</td>
+<td><span class="req-id">FR-11</span>, <span class="req-id">NFR-03</span></td>
+</tr>
+<tr>
+<td><span class="req-id">AT-14</span></td>
+<td>저장 성공 직후 응답 유실·프로세스 재시작</td>
+<td>기존 키 조회·대조로 1회 저장 확인; 중복 행 0</td>
+<td><span class="req-id">FR-09</span>/11, <span class="req-id">NFR-04</span></td>
+</tr>
+<tr>
+<td><span class="req-id">AT-15</span></td>
+<td>금요일 마감 직전·직후, 휴일, 다음 회차 이월</td>
+<td>승인된 달력·마감 적용; 회차 이동이 신규 중복 수요를 만들지 않음</td>
+<td><span class="req-id">FR-01</span>/05/11</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-16</span></td>
+<td>최종 10행 중 저장 7, 보류 2, 발주 없음 1</td>
+<td>10행 모두 추적, ‘부분 완료’ 표시; 7행은 제이북스에서 정확히 대조</td>
+<td><span class="req-id">FR-09</span>/12</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-17</span></td>
+<td>W1/W2/W3=14/7/7, 이전 84일 84부, λ=.7, H=3, SS=2, B/I/P=4/3/2</td>
+<td>d21=1.5, d=1.35, S=7, Q=6; 시점 정합성 통과 조건</td>
+<td><span class="req-id">FR-05</span>, Q04/06/07</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-18</span></td>
+<td>정상 수집·판매 가능일의 주문 0; 일부 날짜는 수집 누락</td>
+<td>정상 0은 포함, 누락은 0으로 채우지 않음; 불완전 3주 목표 변경 보류</td>
+<td><span class="req-id">FR-05</span>, Q04</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-19</span></td>
+<td>이전 주문 이력이 없고 최근 21일만 완전</td>
+<td>λ=1 후보와 근거 표시; 이전 이력을 0으로 넣어 감소시키지 않음</td>
+<td><span class="req-id">FR-05</span>, Q04</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-20</span></td>
+<td>같은 3주 합계 28부이나 14/7/7과 7/7/14 비교</td>
+<td>d21은 각각 1.50과 1.20; 계수·주 순서 정확히 기록</td>
+<td><span class="req-id">FR-05</span>, Q04</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-21</span></td>
+<td>직거래 당일에서 택배 공급처로 변경·휴일 포함</td>
+<td>후보 달력의 H와 해당 H의 SS·S·Q 재계산; 여러 후보 수량 합산 금지</td>
+<td><span class="req-id">FR-05</span>/08, Q06/07</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-22</span></td>
+<td><span class="req-id">AT-17</span>의 공급 2부가 유지 미송이나 도착일 불명으로 변경</td>
+<td>Q=8 자동 저장 금지; 미송 확인 분기로 전환</td>
+<td><span class="req-id">FR-04</span>/05, Q07</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-23</span></td>
+<td>예약을 차감한 재고와 총 미출고 B를 함께 입력하거나 세트/낱권 중복</td>
+<td>단위·배분 계약 위반 탐지; 동일 수요·재고 이중 가감 금지</td>
+<td><span class="req-id">FR-03</span>/05, Q02/07</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-24</span></td>
+<td>과거 기준일 이후 도착한 취소·입고·수동 수정 정보를 학습 입력에 추가</td>
+<td>미래 정보 혼입 탐지; 당시 입력만 사용하고 마지막 평가기간을 튜닝에서 분리</td>
+<td><span class="req-id">FR-05</span>, Q09</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-25</span></td>
+<td>예약한 요일·시각 도달; 같은 예약 이벤트 두 번 수신</td>
+<td>해당 계정·시간대·실행 범위로 1회 등록하고 다음 예정시각 표시</td>
+<td><span class="req-id">FR-01</span>, COL-01/03</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-26</span></td>
+<td>전체/선택 계정에 지금 수집·기간 재수집 실행</td>
+<td>지정 범위의 주문·취소만 대조; 과거 재수집이 증분 진행점을 후퇴시키지 않음</td>
+<td><span class="req-id">FR-01</span>/02, COL-01/03</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-27</span></td>
+<td>수동 수집 중 같은 계정의 예약 발생; 추가 요청 종료시각은 더 늦음</td>
+<td>같은 범위는 진행 연결, 추가 범위는 후속 대기; 병행 반영·새 범위 유실 없음</td>
+<td><span class="req-id">FR-01</span>/11, COL-03</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-28</span></td>
+<td>일부 계정 실패 후 재수집; 오래된 주문의 늦은 취소 도착</td>
+<td>성공 건 중복 반영 없이 실패 구간 복구, 늦은 취소 포함하여 완전성 대조</td>
+<td><span class="req-id">FR-02</span>/11, COL-03</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-29</span></td>
+<td>서버 중단 중 예약 3회 누락 후 재시작</td>
+<td>마지막 성공 범위부터 통합 보충 수집; 지난 회차에 발주 자동 저장 금지</td>
+<td><span class="req-id">FR-01</span>/11, COL-04</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-30</span></td>
+<td>수집만 실행 완료; 별도 1차 발주 요청의 필수 계정은 미완료</td>
+<td>수집 완료와 발주 완료 분리; 수집만으로 발주 저장하지 않고 불완전 연결 실행 보류</td>
+<td><span class="req-id">FR-01</span>/09/12, COL-02</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-31</span></td>
+<td>예약 일시중지 후 수동 실행, 실행 중 수집 중지 요청</td>
+<td>신규 예약만 중지하고 수동 실행 허용; 실행 중지는 반영 결과·진행점을 남겨 복구</td>
+<td><span class="req-id">FR-01</span>/11, COL-04</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-32</span></td>
+<td>기준 거래처 잠정 Q=0, 조건 만료·대체 납기 변경</td>
+<td>0부 조기 종료 없이 후보 정책 재평가; 유효 무발주 정책은 유지</td>
+<td><span class="req-id">FR-05</span>/06/08, Q07/C01</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-33</span></td>
+<td>6부 저장 후 새 실행, 이후 필요 4부로 변경</td>
+<td>6부 중복 없음; 자기 초안으로 필요량 왜곡 없음; 미전송 초안 4부 변경안</td>
+<td><span class="req-id">FR-09</span>/11, 저장 의도 계약</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-34</span></td>
+<td>여러 상품의 배송비 합산·MOQ/부수별 단가 구간 변화</td>
+<td>후보별 및 거래처/계정/배송 묶음 조건을 최종 계획으로 재검증</td>
+<td><span class="req-id">FR-08</span>, C08</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-35</span></td>
+<td>실행권 만료 후 구 워커가 쓰기를 재개</td>
+<td>현재 소유권 없는 쓰기 차단; 같은 반영 단위 중복 없음</td>
+<td><span class="req-id">FR-11</span>, <span class="req-id">NFR-02</span>/03</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-36</span></td>
+<td>여러 단위 중 커밋 성공과 응답 유실 혼재</td>
+<td>성공/실패/불명 구분, 기존 키 조회 후 남은 단위만 처리</td>
+<td><span class="req-id">FR-09</span>/11, <span class="req-id">NFR-04</span></td>
+</tr>
+<tr>
+<td><span class="req-id">AT-37</span></td>
+<td>1차 저장 발주가 전송된 후 고객 취소 도착</td>
+<td>자동 수정·재발주 없이 잠금/전송 상태 충돌 검토</td>
+<td><span class="req-id">FR-02</span>/09/11</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-38</span></td>
+<td>수동 잠금 후 입력·정책 변경, 확인 사실 만료</td>
+<td>수동 값 덮어쓰기 방지 및 재검토 상태; 오래된 조건으로 자동 저장 금지</td>
+<td><span class="req-id">FR-10</span>/11, <span class="req-id">NFR-03</span></td>
+</tr>
+<tr>
+<td><span class="req-id">AT-39</span></td>
+<td>같은 표시 계정의 예약·수동 중첩; 일부 미사용 계정 포함</td>
+<td>활성/필수 계정 버전으로 실행; 동일 범위 중복 반영 없이 후속 범위 보존</td>
+<td><span class="req-id">FR-01</span>/02, COL-05</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-40</span></td>
+<td>취소 수집 성공 후 제이북스 출고 진행 상태</td>
+<td>수신 성공과 내부 충돌 분리; 자동 출고 되돌림·발주 저장 금지</td>
+<td><span class="req-id">FR-02</span>/09, COL-05</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-41</span></td>
+<td>장애주문 상품코드 보정 후 동일 원천 재수신</td>
+<td>원천·보정 이력 연결, 동일 주문행 중복 생성 없음</td>
+<td><span class="req-id">FR-02</span>/10, COL-05</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-42</span></td>
+<td>누적 7/14/21 집계와 원천 3주 비교; 차분 음수</td>
+<td>동일 시각·순수량·세트 기준 대조; 불일치 자동 0 처리 금지</td>
+<td><span class="req-id">FR-05</span>, Q04-A</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-43</span></td>
+<td>10/6/4 유지·종료·지연·불명; 주문유효기간 경과</td>
+<td>원발주 연결과 상태 증거로 판단; 유효기간만으로 잔량 소멸 금지</td>
+<td><span class="req-id">FR-04</span>, B06</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-44</span></td>
+<td>같은 거래처의 마감 직전/직후·휴일·택배 집하</td>
+<td>전송 방식과 운송 구분; 실제 사용할 수 있는 입고일로 H 산출</td>
+<td><span class="req-id">FR-05</span>/08, B06</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-45</span></td>
+<td>16 등 10/18 외 회차 조회·변경·다시 실행</td>
+<td>운영 회차와 업무 의도를 구분; 동일 수요 추가 발주 없음</td>
+<td><span class="req-id">FR-09</span>/11, 회차 계약</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-46</span></td>
+<td>세트 3달 수주 모드와 상품·기간 필터가 충돌</td>
+<td>적용/무시 필터 명시, 21일 학습과 장기 미처리 수주 분리</td>
+<td><span class="req-id">FR-03</span>/05/10, Q04-A</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-47</span></td>
+<td>온라인·오프라인 동일 주문/출고와 공용 재고 예약</td>
+<td>동일 수요 한 번 집계, 확정 오프라인 배분 보호</td>
+<td><span class="req-id">FR-03</span>/05, Q04-A</td>
+</tr>
+<tr>
+<td><span class="req-id">AT-48</span></td>
+<td>기존 UI 상세 수정과 자체 저장 동시 발생; 응답 단절</td>
+<td>실제 수정 경로 모두 변경 탐지; 충돌/불명 구분 후 대조</td>
+<td><span class="req-id">FR-09</span>/11, 회차 계약</td>
+</tr>
+</tbody></table></div>
+<p>모든 시험은 <strong>공급처 전송·결제가 발생하지 않는 환경</strong>에서 수행한다. 시험 입력과 기대 결과는 업무 담당자가 대표 사례와 대조한다.</p>
+<p><strong>실프로그램 검증의 LV-01부터 LV-10은 <span class="req-id">AT-39</span>부터 <span class="req-id">AT-48</span>로 편입했다.</strong> 총 48개는 운영 수용 테스트 계획이다. UI 관찰·문서 검사·시제품 검사는 이 테스트의 합격을 의미하지 않는다.</p>
+<h2 id="s12">12. 개발 순서와 통과 기준</h2>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>산출물</th>
+<th>다음 단계로 넘어가는 조건</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>G0 오전 기준선</td>
+<td>실제 오전의 소요시간·주문량·예외·크롤링 비중</td>
+<td>오후 영상과의 차이, 비교할 대표 업무일 정의</td>
+</tr>
+<tr>
+<td>G1 데이터 계약</td>
+<td>DB 관계·키·수불·미송·저장/전송 경계, 수집·조회 권한</td>
+<td>같은 표본의 원천·화면·DB 결과 설명 가능</td>
+</tr>
+<tr>
+<td>G2 계산 재현</td>
+<td>자체 수집 표본·규칙 엔진·상품별 판단 근거</td>
+<td><span class="req-id">AT-01</span>~12 및 <span class="req-id">AT-17</span>~24의 계산 결과, 산식 비교·담당자 판단 차이 검토</td>
+</tr>
+<tr>
+<td>G3 시험 저장</td>
+<td>자체 주문/취소/수불/발주 반영 모듈, 복구·대조</td>
+<td>전체 수용 테스트, 동시 작업·응답 유실·문자 변환 통과</td>
+</tr>
+<tr>
+<td>G4 제한 운영</td>
+<td>확정된 계정·상품·거래처 범위 자동 저장</td>
+<td>운영 담당자 검토, 중복·누락 검증, 중지·복구 절차 확인</td>
+</tr>
+<tr>
+<td>G5 범위 확대</td>
+<td>정책 보완·오류 원인 개선·성과 비교</td>
+<td>예외 부담과 실제 절감시간을 기준으로 확대 결정</td>
+</tr>
+</tbody></table></div>
+<p>G2까지는 운영 변경 없이 계산 결과를 기존 업무와 비교한다. 실제 운영 반영은 G1의 접근·저장 경계와 G3의 시험 결과를 확인한 후 고객이 정한 범위에서 진행한다. 개발 기간·비용은 수집 경로와 데이터 계약을 확인한 뒤 산정한다.</p>
+<h2 id="s13">13. 성과 지표와 운영 기준</h2>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>지표</th>
+<th>측정 정의</th>
+<th>목표/판정</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>담당자 작업시간</td>
+<td>오전 시작~1차 저장까지 실제 조작·판단 시간; 단순 대기 별도</td>
+<td>유사 주문량·예외량 업무일에서 약 2시간 절감 목표 검증</td>
+</tr>
+<tr>
+<td>전체 경과시간</td>
+<td>예정 시작~저장/보류가 모두 분류된 시점</td>
+<td>실제 거래처 마감 전에 처리 가능한지 측정; 수치 목표는 기준선 후 합의</td>
+</tr>
+<tr>
+<td>자동 완료 비중</td>
+<td>기준시각의 전체 발주 필요 상품 중 사람 개입 없이 저장·대조 완료한 상품 비율</td>
+<td>수동 파일 업로드·미송 확인·수량 수정 개입 시 별도 집계</td>
+</tr>
+<tr>
+<td>미완료 영향</td>
+<td>수집 미완료 계정과 미확정 수요, 확인 필요 행·부수</td>
+<td>수집 누락으로 분모가 불명확하면 자동 완료 비율도 미확정 표시</td>
+</tr>
+<tr>
+<td>정확성</td>
+<td>중복·누락·과다/과소 발주, 거래처·수량 수정 건과 원인</td>
+<td>시험에서 중복 저장·수량 보존 위반 0; 운영 허용 기준 별도 합의</td>
+</tr>
+<tr>
+<td>추적 완전성</td>
+<td>후보 행=저장+보류+발주 없음; 원천·근거·저장 키 연결</td>
+<td>설명 없이 사라지는 행 0; 행 수뿐 아니라 수량 배분도 대조</td>
+</tr>
+</tbody></table></div>
+<p>예외를 숨겨 자동 처리 비율을 높이지 않는다. 재시도 완료와 사람이 해결한 건을 구분하고, 자동화 이전 업무와 동일한 완료 경계를 사용해 비교한다.</p>
+<h2 id="s14">14. DB 검토로 확정할 결정 목록</h2>
+<div class="tablewrap" tabindex="0" role="region" aria-label="가로로 스크롤 가능한 상세 표"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>결정해야 할 내용</th>
+<th>우선 근거</th>
+<th>제품에 미치는 영향</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>D01</td>
+<td>활성 계정·수집 주기/시각·허용 조회 기간·수정 이벤트·호출 제한·완전성</td>
+<td>DB 수집 이력 + 판매처 응답·권한·업무 마감</td>
+<td>예약/수동·기간 재수집·늦은 취소·누락 복구</td>
+</tr>
+<tr>
+<td>D02</td>
+<td>현재고·예약·적정재고의 의미, 최근 3주·이전 주문·취소 이력의 완전성</td>
+<td>DB 정의·시점별 변경 이력·동일 상품 표본</td>
+<td>Q03–Q09 산식·계수·안전재고 검증</td>
+</tr>
+<tr>
+<td>D03</td>
+<td>세트 정의·조립 시점·공유 낱권 배분·취소 후 처리</td>
+<td>구성표·수불·화면/DB 전후 표본</td>
+<td>수량 보존과 재고 조정</td>
+</tr>
+<tr>
+<td>D04</td>
+<td>미송 잔량의 유지/종료·입고 매칭·예정일</td>
+<td>원발주-입고 이력·업체별 설정 + 연락 확인</td>
+<td>신규 발주 차감과 중복 방지</td>
+</tr>
+<tr>
+<td>D05</td>
+<td>공급률 65의 단위·기본 적용군·예외 우선순위</td>
+<td>공급률 이력·선택 결과 + 당시 견적·판단 이유</td>
+<td>크롤링 대상 선정</td>
+</tr>
+<tr>
+<td>D06</td>
+<td>4개 공급처의 조회 경로·계정·실제 견적 기준</td>
+<td>기존 업무 화면 + 조회 권한·원천 응답</td>
+<td>완전 자동 수집 가능 범위</td>
+</tr>
+<tr>
+<td>D07</td>
+<td>직거래/도매·대체 조달, MOQ·배송비·반품·입고기간·영업일·우선순위</td>
+<td>거래처 설정 + 계약·견적·원발주별 부분입고 이력</td>
+<td>거래처별 H·SS·S·Q와 최종 부수</td>
+</tr>
+<tr>
+<td>D08</td>
+<td>오전/오후 코드·마감·휴일·이월 처리</td>
+<td>발주 이력·운영 달력·거래처 조건</td>
+<td>회차와 영업일 계산</td>
+</tr>
+<tr>
+<td>D09</td>
+<td>저장 키·트리거·채번·전송 상태·동시 수정</td>
+<td>스키마·의존 관계·시험 DB 전후 비교</td>
+<td>자체 저장 모듈과 운영 개방 조건</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>접속 조건·시험 환경·백업/복구·정확한 Oracle 버전</td>
+<td>고객 측 서버·DB 조사</td>
+<td>연결 방식·배포·복구 계획</td>
+</tr>
+</tbody></table></div>
+<p>발주 회차 10/18 같은 코드를 실제 10시/18시로 해석하지 않는다. 영상에서 언급된 오전 6시~6시30분 시작, 9시30분·오후 4시 등의 마감은 거래처·계정·요일 범위를 확인한 뒤 설정한다. [N1; V57 17:07–20:31]</p>
+<p>이 목록은 고객에게 같은 질문을 반복하기 위한 설문이 아니다. <strong>동일 주문·상품·원발주 표본을 DB와 원천 자료로 추적하여 답을 채우고, 남은 판단 이유만 현장에서 확인하는 조사 목록</strong>이다.</p>
+<p><strong>추가 데이터 계약:</strong> DB 검토에서 27개 표시 계정의 활성/법인/주문·취소 권한, 장애주문 보정 경로, C7/C14/C21 집계 의미, 세트 3달 필터, 거래처 유효기간/납기/마감, 비표준 회차, 상세 수정 경로를 해당 결정 항목과 함께 조사한다. 데이터에서 설명되는 내용은 중복 인터뷰하지 않고, 이력에 없는 의미·예외만 사례와 함께 확인한다.</p>
+<h2 id="s15">15. 출처와 문서 상태</h2>
+<ul>
+<li>N1 · <a href="https://app.notion.com/p/3de6f936b05980ecbb32d69203182e0f?pvs=204">제이북스 발주자동화 — 현장 메모</a></li>
+<li>R4 · <a href="https://app.notion.com/p/3e06f936b05981ae841af800740cbfeb?pvs=204">발주자동화 재기획 v4 — 9월 17일 현장영상 분석</a></li>
+<li>V55 · <code>DJI_20260917140205_0055_D.MP4</code>: 주문·취소·세트·판매량·크롤링 기준. 주요 구간 04:10–09:31, 10:00–16:46, 20:31–23:47, 28:02–36:03.</li>
+<li>V56 · <code>DJI_20260917143921_0056_D.MP4</code>: 미송·가격 차이·거래 조건·네 공급처 조회·겹치는 세트. 주요 구간 00:11–11:45, 14:27–15:00, 18:40–28:58, 32:44–36:35.</li>
+<li>V57 · <code>DJI_20260917151637_0057_D.MP4</code>: 세트 중복·조회/주문 계정·미송 연락·오전/오후 차이·마감. 주요 구간 02:06–04:51, 11:13–20:31.</li>
+<li>C1 · 고객 대화: 독립 구현, 1차 저장 범위, 2시간 절감 기대, 미송 사례, 서버 정보.</li>
+</ul>
+<p>영상 총 95분 12초의 원음 자동 전사와 표본 화면을 분석했다. 전체 음성을 사람이 교정한 전사본이나 영상 전 프레임 검수가 아니며, 고유명사·숫자·일반화한 규칙은 검증이 필요하다. 원음·전사·화면 검토 자료에서 해당 시각을 대조할 수 있다.</p>
+<p><strong>v0.3 변경 기록:</strong> 고객 요청에 따라 예약·수동 수집을 P0로 명시. COL-01~04, 수집만/1차 발주까지의 범위, 공통 대기열·중복 방지·재수집·누락 예약 복구와 <span class="req-id">AT-25</span>~31 추가. v0.2의 적정재고 산식과 미송·크롤링 규칙을 유지한다. 이 문서는 검토 초안이며 실제 예약 활성화, 운영 DB 연결, 주문·취소 반영, 실제 발주 저장·전송을 수행한 결과가 아니다.</p>
+<p><strong>v0.4 변경 기록:</strong> 기획 통합본 v1.0과 연결하여 0부 조기 종료 조건, 후보별 부수/배송 합산 검증, 저장 의도의 재실행·변경 계약과 <span class="req-id">AT-32</span>~38을 보강했다. 총 38개는 운영 수용 테스트 계획이며, 화면 시제품의 19개 검사와 구분한다. 상세 수치는 고객 데이터 검증 전 설계 제안이다.</p>
+<p><strong>v0.5 변경 기록:</strong> 실프로그램 E01부터 E08을 근거로 COL-05·Q04-A·B06·실제 회차/수정 경로 및 <span class="req-id">AT-39</span>부터 <span class="req-id">AT-48</span>을 반영했다. 통합본 v1.1·화면설계 v0.2·현장 기록지 v1.1과 함께 사용한다. 검증 보고서는 관찰 당시 기록으로 보존하며 현재 설계는 이 본문을 따른다.</p>
+<ul>
+<li>E01 발주업무; E02 주문수집; E03 취소주문수집; E04 거래처별 미입고; E05 세트 재고조정; E06 매입처관리; E07 발주 상세; E08 2026.09.18 - 16 상세 조회. 근거 파일: <code>docs/live-validation-20260920</code>. 고객 전달본은 비식별 검증 보고서로 연결한다.</li>
+</ul>
+</main></div><footer><span>JBOOKS · PRD v0.5 / 논의와 검증을 위한 초안</span><span><a href="https://app.notion.com/p/3e06f936b05981ae841af800740cbfeb?pvs=204">원본 영상 분석 노션</a> &nbsp; / &nbsp; <a href="https://app.notion.com/p/3e06f936b05981ae841af800740cbfeb?pvs=204" target="_blank" rel="noreferrer">재기획 v4</a></span></footer><script>document.getElementById('print').addEventListener('click',()=>window.print());const links=[...document.querySelectorAll('.toc a')];const headings=[...document.querySelectorAll('h2[id]')];let ticking=false;function markSection(){let current=headings[0];for(const h of headings){if(h.getBoundingClientRect().top<=120)current=h;else break;}links.forEach(a=>a.classList.toggle('active',a.hash==='#'+current.id));ticking=false;}addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(markSection);}},{passive:true});markSection();</script></body></html>

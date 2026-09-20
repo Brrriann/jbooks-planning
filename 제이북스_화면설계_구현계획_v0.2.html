@@ -1,0 +1,431 @@
+<!doctype html><html lang="ko"><head><meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>제이북스 · 화면설계와 구현계획 v0.2</title><style>
+:root{--ink:#172e2b;--muted:#62746d;--paper:#fffefa;--bg:#efefe7;--line:#d9e0d4;--accent:#d4e89b;--green:#245b43;--soft:#f2f5eb;--amber:#9b5e1e}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.95 "Malgun Gothic",sans-serif}a{color:var(--green);text-underline-offset:4px}button{font:inherit}a:focus-visible,button:focus-visible,.tablewrap:focus-visible{outline:3px solid #ac7d26;outline-offset:4px}.masthead{background:var(--ink);color:var(--paper);padding:36px max(28px,calc((100vw - 1320px)/2)) 38px;position:relative}.kicker{font:11px/1.6 Consolas,monospace;letter-spacing:.19em;color:#b6c8b4;display:flex;justify-content:space-between;gap:24px}.hero{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:60px;align-items:end;padding-top:30px}h1{font-size:clamp(36px,4.3vw,62px);line-height:1.25;letter-spacing:-.05em;font-weight:600;margin:10px 0 22px}.hero p{color:#c7d4c7;max-width:720px;line-height:1.85;margin:0}.hero em{font-style:normal;color:var(--accent)}.document-stamp{border-top:1px solid #60766a;padding-top:17px;font:12px/2 Consolas,"Malgun Gothic",monospace;color:#ced9c6}.document-stamp strong{color:var(--accent);display:block;font-size:26px;line-height:1.4;margin-bottom:12px}.hero-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.hero-meta span{border:1px solid #516657;color:#d9e2cc;padding:4px 9px;font-size:11px}.toolbar{position:sticky;top:0;z-index:2;background:#fffefaf7;border-bottom:1px solid var(--line);padding:12px max(24px,calc((100vw - 1320px)/2));display:flex;align-items:center;gap:22px;flex-wrap:wrap}.toolbar a,.toolbar button{font-size:12px;text-decoration:none;white-space:nowrap}.toolbar button{margin-left:auto;padding:5px 13px;background:var(--ink);color:white;border:0;cursor:pointer}.overview{max-width:1376px;padding:32px 28px 0;margin:auto;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:0}.overview>div{padding:20px 24px;border:1px solid var(--line);background:var(--paper);border-right:0}.overview>div:last-child{border-right:1px solid var(--line)}.overview small{font:10px Consolas,monospace;letter-spacing:.14em;color:var(--muted);display:block;margin-bottom:10px}.overview b{font-size:19px;font-weight:600;line-height:1.5;display:block}.overview p{font-size:12px;color:var(--muted);margin:7px 0 0}.layout{max-width:1376px;margin:32px auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px;padding:0 28px}.toc{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 110px);overflow:auto;font-size:11px;line-height:1.55}.toc>b{display:block;letter-spacing:.17em;font:10px Consolas,monospace;margin:10px 0 14px}.toc a{display:block;text-decoration:none;padding:9px 0;border-bottom:1px solid var(--line);color:#546a5d}.toc a.active{color:#173d2b;font-weight:bold;border-left:3px solid var(--green);padding-left:9px}.draft-note{padding:14px 0;color:#777667;font-size:11px;line-height:1.8}.content{min-width:0;background:var(--paper);padding:18px 38px 50px;border:1px solid var(--line)}h2{font-size:26px;line-height:1.5;letter-spacing:-.035em;border-top:1px solid #bfcfbe;padding-top:28px;margin:50px 0 20px}h2:first-of-type{margin-top:30px}h3{font-size:18px;line-height:1.6;margin:30px 0 15px}p{margin:13px 0;word-break:keep-all;overflow-wrap:anywhere}li{margin:7px 0;padding-left:4px;word-break:keep-all;overflow-wrap:anywhere}strong{color:#164d35}blockquote{border-left:3px solid var(--green);padding:13px 22px;background:var(--soft);margin:23px 0;font-size:16px;font-weight:500}blockquote p{margin:3px 0}.tablewrap{overflow-x:auto;margin:23px 0;border:1px solid var(--line)}table{border-collapse:collapse;width:100%;min-width:660px;font-size:12px;line-height:1.85}th{text-align:left;background:#224937;color:white;font-weight:500}th,td{padding:13px 14px;vertical-align:top;border-bottom:1px solid var(--line)}td{word-break:keep-all;overflow-wrap:anywhere}tbody tr:nth-child(even){background:#f3f5ee}tbody tr:last-child td{border-bottom:0}.req-id{font-family:Consolas,monospace;font-size:.95em;white-space:nowrap}pre{background:#edf2e6;padding:20px;border-left:3px solid #b8cb91;overflow:auto;font:12px/1.9 Consolas,"Malgun Gothic",monospace}code{font-family:Consolas,"Malgun Gothic",monospace}.logicboard{background:#e9eee2;border:1px solid #c9d4c0;padding:24px;margin:24px -12px}.board-heading{display:flex;justify-content:space-between;gap:20px;margin-bottom:22px;align-items:start}.eyebrow{font:10px/1.7 Consolas,monospace;letter-spacing:.12em}.legend{font-size:10px;color:#667960}.step-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.step{padding:20px 20px 14px;background:var(--paper);border:1px solid #c6d3be;position:relative;min-height:164px}.step-number{position:absolute;right:16px;top:17px;font:30px/1 Consolas,monospace;color:#b4c4a7}.step-top{padding-right:35px}.step small{font:9px Consolas,monospace;color:#6d7f65;letter-spacing:.08em}.step h4{font-size:18px;line-height:1.5;letter-spacing:-.035em;margin:6px 0}.step p{font-size:11px;margin:6px 0 12px;color:#4e6552}.step-note{font-size:10px;border-top:1px solid #dde4d4;padding-top:8px;color:#65755d;line-height:1.8}.terminal{background:#204b36;border-color:#204b36;color:white}.terminal p,.terminal small,.terminal .step-note{color:#d4e2c3}.terminal .step-number{color:#92b88a}.terminal .step-note{border-color:#4a6b4f}.decision-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;border-top:1px solid #bacbb2;margin-top:22px;padding-top:17px}.decision-strip b{font-size:12px;display:block}.decision-strip span{font-size:10px;color:#64755d;display:block;margin-top:5px}.board-foot{font-size:9px;color:#6e7f65;border-top:1px solid #cdd8c4;margin-top:15px;padding-top:12px}.architecture{background:#edf2e7;border:1px solid #cbd8c0;padding:25px;margin:24px 0;text-align:center}.arch-input{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.arch-input>div,.arch-row,.arch-mid>div{border:1px solid #c8d4bd;background:#fffefa;padding:15px 10px}.arch-input small{font:9px Consolas,monospace;color:#6b7c61;letter-spacing:.1em;display:block;margin-bottom:8px}.architecture b{display:block;font-size:13px}.architecture span{font-size:10px;color:#677b5c;display:block;margin-top:5px}.arch-arrow{font:22px/1.6 Consolas,monospace;color:#8aa175}.arch-mid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.arch-mid>div{background:#e0eacf}.arch-output{background:#204b36;padding:20px 12px;color:white}.arch-output span{color:#d0dfb9}footer{max-width:1320px;margin:30px auto 45px;border-top:1px solid #c7d3bf;padding:22px 0;font-size:11px;color:#687760;display:flex;justify-content:space-between;gap:25px}
+@media(max-width:1080px){.layout{grid-template-columns:180px minmax(0,1fr);gap:22px}.content{padding:18px 27px 40px}.overview b{font-size:17px}.toolbar{gap:14px}.hero{gap:30px}}
+@media(max-width:880px){.layout{display:block;margin:24px auto}.toc{position:static;max-height:none;margin-bottom:24px}.toc nav{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.draft-note{display:none}.content{padding:20px 26px}.hero{grid-template-columns:1fr}.document-stamp{display:none}.overview{grid-template-columns:1fr}.overview>div{border-right:1px solid var(--line);border-bottom:0}.overview>div:last-child{border-bottom:1px solid var(--line)}.toolbar{position:static}.overview b{font-size:18px}footer{margin:24px 28px}.logicboard{margin-left:0;margin-right:0}h1{font-size:44px}}
+@media(max-width:560px){.masthead{padding:24px 20px 30px}.kicker{font-size:9px;letter-spacing:.09em}.kicker span:last-child{display:none}.hero{padding-top:14px}h1{font-size:36px}.hero p{font-size:13px}.hero-meta{gap:6px}.toolbar{padding:12px 20px;gap:12px}.toolbar button{margin-left:0}.overview{padding:20px 12px 0}.overview>div{padding:18px}.layout{padding:0 12px}.content{padding:16px}.toc{padding:0 7px}.toc a{font-size:10px}body{font-size:14px}h2{font-size:23px;margin-top:40px}h3{font-size:17px}blockquote{font-size:14px;padding:12px 15px}.logicboard{padding:14px}.board-heading{display:block}.legend{display:block;margin-top:10px}.step-grid{grid-template-columns:1fr}.step{min-height:145px}.decision-strip{grid-template-columns:1fr;gap:12px}.decision-strip>div{display:grid;grid-template-columns:115px 1fr;gap:8px}.decision-strip span{margin-top:0}.arch-input,.arch-mid{grid-template-columns:1fr}.architecture{padding:16px}.arch-input>div{padding:10px}.arch-input small{margin-bottom:4px}footer{display:block;margin:24px 20px}.tablewrap{margin:18px 0}pre{font-size:11px;padding:15px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{@page{size:A4;margin:14mm}html{scroll-behavior:auto}body{background:white;font-size:9pt;line-height:1.65}.toolbar,.toc,.overview{display:none}.masthead{padding:10mm 0;background:white;color:#172e2b;border-bottom:3px solid #245b43}.hero{display:block;padding:0}h1{font-size:28pt;margin:8mm 0}.hero p,.hero em,.kicker{color:#172e2b}.hero-meta span{color:#172e2b}.document-stamp{display:none}.layout{display:block;margin:0;padding:0}.content{border:0;padding:0}h2{font-size:17pt;padding-top:6mm;margin-top:10mm;break-after:avoid}h3{font-size:12pt;break-after:avoid}p,li{orphans:3;widows:3}.tablewrap{overflow:visible;border:0}table{min-width:0;font-size:8pt;line-height:1.6}td,th{padding:7px}tr{break-inside:avoid}th{background:#e4ecde;color:#172e2b}.logicboard,.architecture{break-inside:avoid;margin:6mm 0;padding:15px}.step{min-height:120px;padding:12px}.step h4{font-size:13px}.step-number{font-size:23px}.terminal,.arch-output{background:#e3eddb;color:#172e2b}.terminal p,.terminal small,.terminal .step-note,.arch-output span{color:#455b3a}.step-grid{grid-template-columns:1fr 1fr}.arch-input{grid-template-columns:repeat(3,1fr)}.arch-mid{grid-template-columns:1fr 1fr}footer{margin:10mm 0;font-size:8pt}a{color:inherit}pre{white-space:pre-wrap}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body><header class="masthead"><div class="kicker"><span>JBOOKS / PRODUCT BLUEPRINT</span><span>SCREEN DESIGN & IMPLEMENTATION</span></div><div class="hero"><div><h1>화면의 판단을,<br><em>개발의 단위</em>로.</h1><p>5개 업무 화면과 9개 모듈, 데이터 조사부터 시험 저장까지.<br>PRD v0.5을 구현으로 연결하는 다음 단계의 설계입니다.</p><div class="hero-meta"><span>검토 초안 v0.2</span><span>2026.09.20</span><span>운영 연결 없음</span></div></div><div class="document-stamp"><strong>SCREEN DESIGN<br>+ BUILD PLAN</strong>UI / 5 SCREENS<br>MODULES / 9<br>WORK PACKAGES / 10</div></div></header><nav class="toolbar"><a href="index.html">기획 자료실</a><a href="제이북스_발주자동화_기획통합본_v1.1.html">기획 통합본</a><a href="화면_프로토타입/index.html">화면 시제품 열기 ↗</a><a href="제이북스_발주자동화_PRD_로직보드_v0.5.html">PRD v0.5</a><a href="제이북스_화면설계_구현계획_v0.2.md" download>원문 MD ↓</a><a href="https://app.notion.com/p/3e06f936b05981fc8d73f4bb5cda0b22?pvs=204">노션 ↗</a><button onclick="window.print()">인쇄 / PDF 저장</button></nav><div class="layout"><aside class="toc"><b>CONTENTS / 07</b><nav><a href="#s01">01. 먼저 검토할 화면 흐름</a><a href="#s02">02. 화면별 상세 설계</a><a href="#s03">03. 공통 상태와 표시 규칙</a><a href="#s04">04. 자체 구현 모듈과 데이터 경계</a><a href="#s05">05. 고객사 내부에서 진행할 DB 조사 순서</a><a href="#s06">06. 개발 작업 묶음과 검증 순서</a><a href="#s07">07. 시제품 검토 시나리오와 한계</a></nav></aside><main class="content">
+<p><strong>v0.2 · 실프로그램 검증 반영 · 2026.09.20</strong><br>기준: <a href="https://app.notion.com/p/3e06f936b059810c8804f14cb84d182d?pvs=204">PRD v0.5 · 예약·수동 수집</a></p>
+<p><strong>2026.09.20 정합성 보강:</strong> 기획 통합본 v1.1의 저장 변경·후보 합산·정책 효력 계약과 PRD v0.5를 함께 적용한다. 시제품의 기능 범위는 아래 한계에 명시한다.</p>
+<p>이번 단계는 PRD를 화면·상태·개발 작업으로 연결하는 설계다. 함께 제공하는 화면은 <strong>가상 상품·계정·견적·주문으로 동작하는 오프라인 시제품</strong>이다. 실제 수집·Oracle 저장·예약 실행을 구현하거나 연결한 결과가 아니다. 화면에서 바꾼 예시는 새로고침하면 초기화된다.</p>
+<h2 id="s01">01. 먼저 검토할 화면 흐름</h2>
+<ol>
+<li><strong>오전 현황:</strong> 수집이 완전한지, 저장 가능한 상품과 확인할 상품이 각각 몇 개인지 본다.</li>
+<li><strong>수집센터:</strong> 예약 설정 또는 지금 수집을 선택한다. 수집만과 1차 발주까지를 구분한다.</li>
+<li><strong>발주 검토:</strong> 상품별 부족분·적정재고·유효 공급·거래처 비교 근거를 본다.</li>
+<li><strong>미송관리:</strong> 원발주의 잔량 유지·종료·입고일을 확인하고 발주 후보를 다시 계산한다.</li>
+<li><strong>실행 이력:</strong> 수집, 보류, 수정, 저장 결과를 대조한다.</li>
+</ol>
+<p>화면의 기본 완료 경계는 <strong>제이북스에 거래처·부수를 1차 발주 상태로 저장하고 대조하는 것</strong>이다. 실제 공급처 주문·결제는 화면 흐름에 포함하지 않는다.</p>
+<h2 id="s02">02. 화면별 상세 설계</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>화면</th>
+<th>필요한 정보</th>
+<th>주요 행동</th>
+<th>처리 조건</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UI-01</td>
+<td>오전 현황</td>
+<td>기준시각, 필수 계정 완전성, 저장 가능/확인 필요/발주 없음/저장 완료, 마감·누락 원인</td>
+<td>수집센터 이동, 확인 항목 열기, 저장 결과 보기</td>
+<td>수집 미완료를 전체 완료로 표시하지 않음</td>
+</tr>
+<tr>
+<td>UI-02</td>
+<td>수집센터</td>
+<td>계정별 주문/취소 상태, 마지막 성공 범위, 다음 예약, 실행 범위·대기열</td>
+<td>지금 수집, 선택 계정 수집, 실패 재수집, 기간 재수집, 예약 설정</td>
+<td>빈 계정·역전 기간 차단; 진행 중인 요청과 추가 범위 구분</td>
+</tr>
+<tr>
+<td>UI-03</td>
+<td>발주 검토</td>
+<td>원수요·세트 구성, 목표재고, 현재고·미송, 크롤링 선정 이유, 네 공급처 비교</td>
+<td>상품 검색·상태 필터, 산식 입력 비교, 거래처 변경, 검증된 후보 저장</td>
+<td>필수 계정/미송/견적/최신 상태가 불명확하면 저장 보류</td>
+</tr>
+<tr>
+<td>UI-04</td>
+<td>미송관리</td>
+<td>상품×거래처×원발주 행, 발주/입고/잔량, 필요일·예정일, 업체 답변·시각</td>
+<td>잔량 유지와 예정일 확인, 잔량 종료 확인, 미확인 유지</td>
+<td>확인 사유 필수; 늦은 입고를 정시 공급으로 차감하지 않음</td>
+</tr>
+<tr>
+<td>UI-05</td>
+<td>실행 이력</td>
+<td>요청자/예약, 기준시각, 계정·범위·정책 버전, 처리 건수, 저장 업무 키·대조</td>
+<td>실행 필터·상세, 실패 지점 재처리</td>
+<td>성공 응답 유실과 실패를 구분하고 중복 저장하지 않음</td>
+</tr>
+</tbody></table></div>
+<h3>UI-02. 예약과 수동 수집</h3>
+<p>예약 설정에는 시간대, 실행 요일·시각 또는 반복 간격, 대상 계정, 활성/중지, 후속 처리 범위를 둔다. 수동 실행에는 전체/선택 계정, 증분/기간 재수집, 수집만/1차 발주까지를 둔다. 예약 일시중지는 수동 실행을 막지 않는다.</p>
+<p>공통 실행 대기열이 같은 계정의 중복 반영을 막는다. 같은 범위의 요청은 기존 실행에 연결하고 더 늦은 종료시각·다른 범위는 후속 작업으로 남긴다. 운영 구현에서는 서로 다른 계정을 판매처 호출 제한 안에서 처리한다. 시제품은 흐름을 검토하기 위해 한 번에 한 작업을 처리한다.</p>
+<p><strong>검토용 예약 실행 버튼은 설정을 읽어 예시 작업 1건을 발생시킨다.</strong> PC가 꺼진 동안 동작하는 실제 스케줄러, 주기 실행, 외부 판매처 조회는 없다. 실제 개발에서는 서버 측 예약 실행과 누락 예약의 통합 보충 수집을 구현한다.</p>
+<p><strong>실프로그램 반영:</strong> 계정 표는 주문 수신·취소 수신·내부 반영·대조 상태를 구분한다. 운영 계정 원장은 10개 그룹·27개 표시를 출발점으로 활성/법인/권한을 검증한다. 시제품 조작 대상은 3개 가상 계정이며, 실제 화면 목록은 읽기 전용 참고표다. 취소 반영 대기 예시를 켜면 수집 성공 후에도 모의 저장은 막히고 별도 반영 확인 후 풀린다.</p>
+<p>운영의 장애주문은 원천과 보정 전후를 보존하고 재처리한다. 출고 충돌은 정상 반영 대기와 별도이며 ‘출고중 → 미출고’를 자동으로 누르거나 운영 검토를 가상의 반영 확인 버튼으로 대체하지 않는다. 장애주문 보정·출고 충돌의 실제 화면 연결은 후속 구현이다.</p>
+<h3>UI-03. 상품별 판단과 적정재고</h3>
+<p>상품 상세는 다음 순서로 읽는다.</p>
+<ol>
+<li>현재 확정 수요와 세트 구성품 수요.</li>
+<li>최근 3주 W1/W2/W3와 이전 일평균 수요, 적용 가중치.</li>
+<li>선택 거래처의 보충기간 H와 안전재고 SS, 목표재고 S.</li>
+<li>물리 재고 I·유효 입고예정량 P와 최종 후보 Q.</li>
+<li>크롤링 선정·제외 이유와 공급처별 선택·탈락 근거.</li>
+</ol>
+<p>시제품의 대표 상품은 PRD 예시를 사용한다. W1/W2/W3=14/7/7, 이전 일평균=1, λ=.7, H=3, SS=2이면 S=7이다. 미출고 4, 물리 재고 3, 유효 공급 2이면 Q=6이다. 가중치·공급기간·안전재고와 거래처 조건은 고객에게서 추정한 실제 값이 아니다.</p>
+<p>조회 결과가 누락된 공급처는 품절로 바꾸지 않는다. 시제품의 ‘예시 조회 완료’는 검토 시나리오를 다음 상태로 이동시키는 기능이며 실제 견적을 가져오지 않는다. 대표 상품의 거래처를 바꾸면 해당 예시 조건의 H·SS·S·Q를 다시 계산한다. 다른 상품의 목표재고는 단순화한 고정 예시이며 전체 상품의 예측 엔진이 아니다. 네 공급처의 후보 수량을 각각 저장하지 않는다.</p>
+<p><strong>집계·필터:</strong> W1/W2/W3는 겹치지 않는 주간 순수요다. C7/C14/C21이 같은 시점 누적임이 확인된 경우만 차분 변환한다. 화면에 온라인/오프라인 범위·취소 처리 기준·집계시각을 제시하고, 세트 3달 수주와 21일 학습 범위를 구분한다. 이 의미 검증을 시제품 예시 값으로 대신하지 않는다.</p>
+<p><strong>회차:</strong> 시제품은 10·11·16·18 등의 임의 가상 회차를 선택해 저장 이력에 남긴다. 실제 운영 코드는 DB 확인 후 구성하며 시각으로 해석하지 않는다. 기존 UI의 저장/F7·상세 일괄 수정·복사 경로와 충돌하는 변경은 재조회로 확인한다.</p>
+<h3>UI-04. 미송 확인과 재계산</h3>
+<p>검토 예시는 발주 10부, 입고 6부, 미확인 잔량 4부다. 필요한 날짜 안의 잔량 유지·입고가 확인되면 4부를 유효 공급으로 배분한다. 잔량 종료가 확인되면 최신 수요로 필요량을 재계산한다. 입고일이 필요일보다 늦거나 여전히 불명이면 자동 저장 보류를 유지한다.</p>
+<p>입고 예정 확인은 실물 입고가 아니다. 잔량 확인을 했다는 이유로 창고 재고를 올리지 않는다. 사실 입력에는 확인 방식·시각·근거가 필요하며 운영 구현에서는 원발주별 수불과 업체 답변을 연결한다.</p>
+<p><strong>정책 기본값:</strong> 거래처의 주문유효기간·입고 시일·마감시간·발주방식·법인 값을 먼저 매핑한다. 유효기간 만료와 미송 소멸, 전송 방식과 택배 여부를 분리한다. 원발주 연결과 근거가 없으면 자동 종료·재발주를 보류한다. 시제품은 이 원칙을 안내하며 마스터 동기화 자체는 구현하지 않는다.</p>
+<h2 id="s03">03. 공통 상태와 표시 규칙</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>대상</th>
+<th>상태 흐름</th>
+<th>화면 표시와 제약</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>수집 요청</td>
+<td>대기 → 수신 → 내부 반영 → 대조 완료 / 실패 / 충돌</td>
+<td>주문·취소 각각 추적; 반영 대기는 발주 완료가 아님</td>
+</tr>
+<tr>
+<td>발주 후보</td>
+<td>계산 → 조건 확인 → 저장 가능/확인 필요/발주 없음</td>
+<td>보류 사유와 영향 수량을 남김</td>
+</tr>
+<tr>
+<td>저장</td>
+<td>저장 대기 → 처리 중 → 대조 완료 또는 결과 불명</td>
+<td>결과 불명은 업무 키 조회부터 수행; 무조건 재삽입 금지</td>
+</tr>
+<tr>
+<td>미송</td>
+<td>미확인 → 유효 공급/잔량 종료/늦은 입고</td>
+<td>원발주 행 단위로 기록; 자동 입고 처리 없음</td>
+</tr>
+<tr>
+<td>예약</td>
+<td>활성/일시중지</td>
+<td>예약 중지와 이미 실행 중인 작업 중지를 구분</td>
+</tr>
+</tbody></table></div>
+<p>예외 목록은 ‘왜 못했는가’와 ‘무엇을 확인하면 되는가’를 함께 보여준다. 계정 수집 누락, 미송 유지 여부, 가격/판본/파일 누락, 동시 수정 충돌은 같은 ‘오류’ 문구로 합치지 않는다. 목록이 비면 처리 완료인지 검색 결과 없음인지 구분한다.</p>
+<h2 id="s04">04. 자체 구현 모듈과 데이터 경계</h2>
+<p>초기 구현은 기능별 모듈을 가진 하나의 애플리케이션과 작업 워커 구조를 우선 검토한다. 필요성이 확인되기 전에 여러 서버로 분리하지 않는다. 런타임과 DB 드라이버는 정확한 Oracle 버전·수집 방식·운영 환경 확인 후 확정한다.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>모듈</th>
+<th>책임</th>
+<th>입력 → 출력</th>
+<th>핵심 검증</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M01 실행 관리</td>
+<td>예약·수동 요청, 실행권·대기열·진행점</td>
+<td>요청 설정 → 실행·계정별 작업</td>
+<td>중복 요청·범위 병합·누락 예약 복구</td>
+</tr>
+<tr>
+<td>M02 판매처 수집</td>
+<td>주문·취소 어댑터와 원천 보관</td>
+<td>판매처 응답 → 정규화 이벤트·완전성</td>
+<td>부분취소·역순·늦은 취소·호출 제한</td>
+</tr>
+<tr>
+<td>M03 Oracle 읽기</td>
+<td>상품·세트·재고·발주·입고 기준 상태</td>
+<td>조사된 실제 스키마 → 버전 있는 스냅샷</td>
+<td>단위·집계·채번·트리거 의존성</td>
+</tr>
+<tr>
+<td>M04 수요·재고 계산</td>
+<td>세트 합산·배분, 3주/이전 수요·목표재고</td>
+<td>원수요·재고·정책 → S·부족분·근거</td>
+<td>수량 보존·취소·희소 수요·시점 재현</td>
+</tr>
+<tr>
+<td>M05 미송 원장</td>
+<td>원발주별 잔량·입고·확인 사실</td>
+<td>원발주/입고/업체 답변 → 유효 공급·보류</td>
+<td>부분입고 매칭·종료·필요일 대조</td>
+</tr>
+<tr>
+<td>M06 공급처 조회</td>
+<td>북센·교보·예스24·알라딘의 독립 조회</td>
+<td>상품·판본·계정 → 견적·가용성·조건</td>
+<td>조회 실패≠품절; 원천·시각 보관</td>
+</tr>
+<tr>
+<td>M07 발주 계획</td>
+<td>대상 선정·후보 비교·최종 배분</td>
+<td>필요량·견적·정책 → 거래처·부수 계획</td>
+<td>공급처 변경 시 H·S·Q 재계산</td>
+</tr>
+<tr>
+<td>M08 저장·대조</td>
+<td>자체 상태 반영과 1차 발주 저장</td>
+<td>검증된 계획·입력 버전 → 업무 키·대조 결과</td>
+<td>동시 수정·응답 유실·부분 커밋·전송 경계</td>
+</tr>
+<tr>
+<td>M09 검토 화면·이력</td>
+<td>진행 상태·근거·예외·수정·성과</td>
+<td>각 모듈 결과 → 검토·재계산 요청</td>
+<td>수동 변경 보존·권한·추적성</td>
+</tr>
+</tbody></table></div>
+<p>기존 프로그램의 코드·스크립트·업무 함수를 재사용하지 않는다. 기존 DB의 무결성 조건과 트리거는 분석해야 하며 자체 코드에서 이를 위반하지 않아야 한다. 이 문서의 논리 명칭은 실제 테이블명·컬럼명·API 주소를 뜻하지 않는다.</p>
+<h3>최소 데이터 계약</h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>논리 기록</th>
+<th>필요한 내용</th>
+<th>구분해야 할 상태</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CollectionRequest / Run</td>
+<td>방식·요청자·예약 ID·조회 범위·대상·후속 처리·기준시각</td>
+<td>요청 접수와 실제 처리 완료</td>
+</tr>
+<tr>
+<td>AccountCheckpoint</td>
+<td>주문/취소 각각의 성공 범위·커서·원천 버전</td>
+<td>실패 범위와 아직 미조회인 범위</td>
+</tr>
+<tr>
+<td>DemandAllocation</td>
+<td>원주문행·세트 구성·낱권·재고/공급 배분·필요일</td>
+<td>계산상 배분과 물리적 세트 조립</td>
+</tr>
+<tr>
+<td>StockDecision</td>
+<td>W1/W2/W3·이전 기간·가중치·H·SS·S·B/I/P·Q</td>
+<td>시험 계수와 검증된 정책</td>
+</tr>
+<tr>
+<td>SupplyBalance</td>
+<td>원발주행·입고행·잔량·종료·배송·예정일·확인 사실</td>
+<td>입고 예정과 실물 입고</td>
+</tr>
+<tr>
+<td>SupplierQuote</td>
+<td>동일 상품/판본·가격 기준·시각·가용성·거래 조건</td>
+<td>품절·누락·인증 실패·조회 실패</td>
+</tr>
+<tr>
+<td>PurchaseIntent / SaveResult</td>
+<td>배분 키·선택 거래처/부수·입력/정책 버전·운영 키</td>
+<td>저장 성공·대조 완료·결과 불명</td>
+</tr>
+</tbody></table></div>
+<h2 id="s05">05. 고객사 내부에서 진행할 DB 조사 순서</h2>
+<p>접근은 고객사가 정한 절차에 따라 수행하며, 최초 조사는 읽기 전용 권한·제한 표본으로 진행한다. 운영 변경 없이 결과를 대조할 수 있는 시험 환경과 복구 절차부터 확인한다. 실제 접속정보를 이 문서에 기록하지 않는다.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>순서</th>
+<th>조사 대상</th>
+<th>확보할 산출물</th>
+<th>통과 기준</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DB-01</td>
+<td>버전·문자셋·권한·접속 조건·시험 DB·백업/복구</td>
+<td>접속/조회 범위와 시험 계획</td>
+<td>정확한 버전과 고객 측 접근 절차 확인</td>
+</tr>
+<tr>
+<td>DB-02</td>
+<td>테이블·뷰·키·제약·트리거·채번·후속 전송</td>
+<td>실제 객체 관계도·저장 의존성 목록</td>
+<td>1차 저장과 공급처 전송 경계 설명 가능</td>
+</tr>
+<tr>
+<td>DB-03</td>
+<td>주문·취소·계정·수집 이력</td>
+<td>원천↔수주 키, 상태 전이·완전성 계약</td>
+<td>27개 표시의 활성·법인 대조, 생성·부분/늦은 취소·장애주문 추적</td>
+</tr>
+<tr>
+<td>DB-04</td>
+<td>상품·판본·세트 구성·수불</td>
+<td>구성표와 배분/조립 단위</td>
+<td>겹치는 세트 2개와 실물 조정 전후 일치</td>
+</tr>
+<tr>
+<td>DB-05</td>
+<td>현재고·예약·적정재고·변경 이력</td>
+<td>총량/예약 차감 정의·과거 시점 복원 범위</td>
+<td>같은 수요·재고 이중 가감 없음</td>
+</tr>
+<tr>
+<td>DB-06</td>
+<td>원발주·입고·배송·취소·잔량 종료</td>
+<td>원발주-부분입고 매칭, 미송 유효성</td>
+<td>10부/6부 사례와 연속 발주 사례 설명</td>
+</tr>
+<tr>
+<td>DB-07</td>
+<td>거래처·출판사·공급률·조건·발주 회차</td>
+<td>직거래/도매·크롤링 예외·달력·마감 정책</td>
+<td>유효기간/입고 시일/마감/법인·65 단위·복수 회차를 실제 이력에 연결</td>
+</tr>
+<tr>
+<td>DB-08</td>
+<td>3주 및 이전 주문·취소·입고 이력</td>
+<td>비식별 계산 표본·당시 상태·누락표</td>
+<td>C7/14/21와 원천 주간 수요 대조, 온라인·오프라인/세트 범위 확정</td>
+</tr>
+<tr>
+<td>DB-09</td>
+<td>최종 저장·동시 수정·화면 반영</td>
+<td>시험 저장 계약·대조 쿼리·복구 절차</td>
+<td>F7·상세 수정 경로와 충돌 검증; 외부 전송 없이 거래처/부수 일치</td>
+</tr>
+</tbody></table></div>
+<p>DB에서 확인할 수 없는 당일 견적·계약 변경·전화 확인은 해당 표본에만 보완한다. 테이블명이나 이벤트 의미가 밝혀지기 전에 대량 조회 SQL 또는 운영 쓰기 SQL을 확정하지 않는다.</p>
+<h2 id="s06">06. 개발 작업 묶음과 검증 순서</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>작업</th>
+<th>선행 조건</th>
+<th>구체적 산출물</th>
+<th>완료 판정</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>W01 데이터 계약 확정</td>
+<td>고객 측 읽기 권한·표본</td>
+<td>DB-01~09 조사표와 정규화 계약</td>
+<td>원천·DB·화면 표본 대조</td>
+</tr>
+<tr>
+<td>W02 실행·상태 기반</td>
+<td>수집 계정·시간 정책</td>
+<td>수동/예약 요청·대기열·상태·이력</td>
+<td>PRD AT-25~27, AT-29~31</td>
+</tr>
+<tr>
+<td>W03 주문/취소 어댑터</td>
+<td>원천 권한·이벤트 계약</td>
+<td>어댑터별 수집·진행점·중복 제거</td>
+<td>AT-01~03, AT-28, AT-39~41</td>
+</tr>
+<tr>
+<td>W04 세트·배분 엔진</td>
+<td>상품/재고 계약</td>
+<td>계산 전용 배분과 조정 계획</td>
+<td>AT-04/05/23의 계산 불변식</td>
+</tr>
+<tr>
+<td>W05 미송 엔진</td>
+<td>원발주/입고 계약</td>
+<td>잔량 원장·확인 사실·필요일 공급</td>
+<td>AT-06~08, AT-22, AT-43~44</td>
+</tr>
+<tr>
+<td>W06 적정재고 산식</td>
+<td>완전한 주문 이력·입고 달력</td>
+<td>계수·시점 재현·S/Q 근거</td>
+<td>AT-17~21/24, AT-42/46/47; 미검증 계수 구분</td>
+</tr>
+<tr>
+<td>W07 공급처 조회·선택</td>
+<td>네 공급처 조회 경로·계정</td>
+<td>독립 조회·비교·대상 선정 정책</td>
+<td>AT-09~12/32/34; 실패와 품절 분리</td>
+</tr>
+<tr>
+<td>W08 화면 연결</td>
+<td>각 계산/조회 결과 계약</td>
+<td>UI-01~05와 변경·재계산</td>
+<td>확인 이유→해결→재계산 흐름 대조</td>
+</tr>
+<tr>
+<td>W09 시험 저장·복구</td>
+<td>시험 DB·저장/전송 경계</td>
+<td>자체 반영·버전 검증·멱등 키·대조</td>
+<td>AT-05/13~16/33/35~38/45/48; 응답 유실·수량 보존·변경 계약</td>
+</tr>
+<tr>
+<td>W10 제한 운영 평가</td>
+<td>48개 운영 수용 테스트·고객 운영 범위</td>
+<td>기준선 대비 시간·오류·예외 측정</td>
+<td>중복·누락·과다/과소 발주 및 시간 절감 검토</td>
+</tr>
+</tbody></table></div>
+<p>W02의 작업 발생기는 운영 예약과 연결하기 전 가상 시계로 검증한다. W03~07은 가능한 범위에서 계산 전용으로 진행하고 W09 시험을 통과하기 전 운영 저장을 개방하지 않는다. 위 목록은 작업 범위이며 일정·비용 확정표가 아니다. 데이터 접근·수집 경로를 확인한 뒤 각 작업을 구현·시험 단위로 나누어 산정한다.</p>
+<h2 id="s07">07. 시제품 검토 시나리오와 한계</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>순서</th>
+<th>검토 행동</th>
+<th>기대 결과</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>초기 오전 현황 열기</td>
+<td>실패 계정과 확인 필요 상품 표시; 저장은 수집 완전성 때문에 보류</td>
+</tr>
+<tr>
+<td>2</td>
+<td>수집센터에서 실패 계정 재수집</td>
+<td>예시 수집 완료, 발주 저장 건수는 그대로</td>
+</tr>
+<tr>
+<td>3</td>
+<td>같은 범위로 수집을 연속 요청</td>
+<td>진행 중인 예시 작업으로 연결; 중복 반영 없음</td>
+</tr>
+<tr>
+<td>4</td>
+<td>대표 상품의 최근 주문 또는 거래처 변경</td>
+<td>목표재고와 후보 부수가 연결되어 변경</td>
+</tr>
+<tr>
+<td>5</td>
+<td>미송 잔량 4부를 필요일 안의 입고로 확인</td>
+<td>실물 재고는 그대로, 유효 공급에만 반영; 해당 발주 필요량 재계산</td>
+</tr>
+<tr>
+<td>6</td>
+<td>견적 누락 상품의 예시 조회 완료</td>
+<td>누락 상태가 해소되어 네 공급처 비교 가능</td>
+</tr>
+<tr>
+<td>7</td>
+<td>저장 가능한 후보의 모의 저장을 두 번 실행</td>
+<td>첫 실행의 후보만 완료, 같은 예시 발주 중복 없음</td>
+</tr>
+<tr>
+<td>8</td>
+<td>검색 결과 없음·수집 실패·빈 계정 입력 보기</td>
+<td>빈 목록·오류·입력 검증 상태가 명확히 표시</td>
+</tr>
+</tbody></table></div>
+<p>시제품은 화면 흐름과 대표 계산의 검토 범위다. 실제 스케줄러, 판매처 인증·API/파일 수집, Oracle 트랜잭션·수불·전송 경계, 분산 실행권, 실제 금액 비교, 운영 데이터 복구를 구현하거나 검증하지 않았다. 세트의 복잡한 조립·부분입고 매칭·여러 납기의 시간별 배분은 설계 및 수용 테스트에 남아 있다. 예시 입력을 실제 저장 계수나 실제 공급처 조건으로 사용하지 않는다.</p>
+<p><strong>v0.2 시제품 보강:</strong> 취소 수신/내부 반영 표시, 반영 대기 시 모의 저장 보류, 별도 예시 반영 확인, 여러 회차 선택과 모의 저장 이력, 실제 화면 27개 계정의 비활성 참고표, 산식·세트 필터·마스터 의미 안내를 추가했다. 원발주 DB 매칭, 장애주문 편집·재처리, 모든 동시 수정·초안 개정 계약은 운영 구현 전 검증 항목으로 남는다.</p>
+<p><strong>다음 구현의 첫 착수점:</strong> 고객사에서 DB-01~03의 읽기 범위와 주문·취소 표본을 확보하여, 실제 테이블·이벤트를 정규화 계약에 연결한다. 화면 검토와 데이터 조사는 병행할 수 있다.</p>
+</main></div><footer><span>JBOOKS · 화면설계와 구현계획</span><span>가상 데이터로 화면 흐름을 검토하는 문서입니다.</span></footer></body></html>
